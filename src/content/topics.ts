@@ -1056,18 +1056,18 @@ export const TOPICS: Record<TopicId, Topic> = {
     id: 'a11y',
     title: t('Доступность (a11y)', 'Accessibility (a11y)', 'Dostępność (a11y)'),
     thesis: t(
-      'Доступность — требование к продукту, а не финальная полировка: семантический HTML закрывает большую часть задач, ARIA нужна только там, где семантики не хватает, а проверки автоматизированы в CI и дополнены ручным прогоном. WCAG 2.2 AA задаёт критерии приёмки.',
-      'Accessibility is a product requirement, not final polish: semantic HTML covers most of it, ARIA is for where semantics fall short, and checks are automated in CI and backed by a manual pass. WCAG 2.2 AA provides the acceptance criteria.',
-      'Dostępność to wymaganie produktu, a nie końcowy szlif: semantyczny HTML pokrywa większość spraw, ARIA służy tam, gdzie semantyki brakuje, a kontrole są zautomatyzowane w CI i uzupełnione ręcznym przeglądem. WCAG 2.2 AA wyznacza kryteria akceptacji.',
+      'Доступность — требование к продукту, а не финальная полировка: семантический HTML закрывает большую часть задач, ARIA нужна только там, где семантики не хватает, а проверки автоматизированы в CI и дополнены ручным прогоном. Критерии приёмки берём из WCAG 2.2 AA (рекомендация W3C).',
+      'Accessibility is a product requirement, not final polish: semantic HTML covers most of it, ARIA is for where semantics fall short, and checks are automated in CI and backed by a manual pass. The acceptance criteria come from WCAG 2.2 AA (a W3C recommendation).',
+      'Dostępność to wymaganie produktu, a nie końcowy szlif: semantyczny HTML pokrywa większość spraw, ARIA służy tam, gdzie semantyki brakuje, a kontrole są zautomatyzowane w CI i uzupełnione ręcznym przeglądem. Kryteria akceptacji pochodzą z WCAG 2.2 AA (rekomendacja W3C).',
     ),
     ...TEXTBOOK.a11y,
     rows: [
       {
         label: t('WCAG и уровень AA', 'WCAG and level AA', 'WCAG i poziom AA'),
         body: t(
-          'Четыре принципа: воспринимаемость, управляемость, понятность, надёжность. Целимся в AA: контраст текста 4,5:1, всё доступно с клавиатуры, видимый фокус, подписи у полей, достаточный размер целей нажатия.',
-          'Four principles: perceivable, operable, understandable, robust. Target AA: 4.5:1 text contrast, everything reachable by keyboard, visible focus, labelled fields, sufficient target size.',
-          'Cztery zasady: postrzegalność, funkcjonalność, zrozumiałość, solidność. Celujemy w AA: kontrast tekstu 4,5:1, wszystko dostępne z klawiatury, widoczny fokus, opisane pola, wystarczający rozmiar celów dotyku.',
+          'Четыре принципа: воспринимаемость, управляемость, понятность, надёжность. WCAG — рекомендация W3C; регуляторные требования (EAA, EN 301 549) ссылаются на неё. Целимся в AA: контраст текста 4,5:1, всё доступно с клавиатуры, видимый фокус, подписи у полей, размер цели нажатия не менее 24×24 CSS px (SC 2.5.8).',
+          'Four principles: perceivable, operable, understandable, robust. WCAG is a W3C recommendation; regulatory requirements (EAA, EN 301 549) refer to it. Target AA: 4.5:1 text contrast, everything reachable by keyboard, visible focus, labelled fields, target size of at least 24×24 CSS px (SC 2.5.8).',
+          'Cztery zasady: postrzegalność, funkcjonalność, zrozumiałość, solidność. WCAG to rekomendacja W3C; wymogi regulacyjne (EAA, EN 301 549) się do niej odwołują. Celujemy w AA: kontrast tekstu 4,5:1, wszystko dostępne z klawiatury, widoczny fokus, opisane pola, rozmiar celu dotyku co najmniej 24×24 CSS px (SC 2.5.8).',
         ),
       },
       {
@@ -1128,9 +1128,9 @@ export const TOPICS: Record<TopicId, Topic> = {
         'Trade-offy: prymitywy i ograniczenia kontrastu spowalniają prototypowanie i kłócą się z marką; ręczne kontrole kosztują czas; automatyka łapie tylko część problemów. Lekarstwem jest wbudowanie w prymitywy i kryteria akceptacji, a nie osobny „sprint a11y”.',
       ),
       t(
-        'Сигнал эволюции: начинаем с семантики и axe в CI для критичных сценариев. Если ручные проверки регулярно находят то, что пропустил axe, или появляется юридическое требование (European Accessibility Act), нанимаем a11y-ownership, вводим аудит и пользовательские тесты; пересматриваем подход раз в квартал.',
-        'Evolution signal: start with semantics and axe in CI for critical flows. If manual checks keep finding what axe missed, or a legal requirement appears (the European Accessibility Act), add a11y ownership, audits and testing with real users; revisit the approach quarterly.',
-        'Sygnał ewolucji: zaczynamy od semantyki i axe w CI dla krytycznych scenariuszy. Jeśli ręczne kontrole regularnie znajdują to, co axe przepuścił, albo pojawia się wymóg prawny (European Accessibility Act), dodajemy ownership dostępności, audyty i testy z prawdziwymi użytkownikami; podejście rewidujemy co kwartał.',
+        'Сигнал эволюции: начинаем с семантики и axe в CI для критичных сценариев. Если ручные проверки регулярно находят то, что пропустил axe, или появляется регуляторный контекст (European Accessibility Act и EN 301 549, которые ссылаются на WCAG; это не юридическая консультация), нанимаем a11y-ownership, вводим аудит и пользовательские тесты; пересматриваем подход раз в квартал.',
+        'Evolution signal: start with semantics and axe in CI for critical flows. If manual checks keep finding what axe missed, or a regulatory context appears (the European Accessibility Act and EN 301 549, which refer to WCAG; this is not legal advice), add a11y ownership, audits and testing with real users; revisit the approach quarterly.',
+        'Sygnał ewolucji: zaczynamy od semantyki i axe w CI dla krytycznych scenariuszy. Jeśli ręczne kontrole regularnie znajdują to, co axe przepuścił, albo pojawia się kontekst regulacyjny (European Accessibility Act i EN 301 549, które odwołują się do WCAG; to nie porada prawna), dodajemy ownership dostępności, audyty i testy z prawdziwymi użytkownikami; podejście rewidujemy co kwartał.',
       ),
       t(
         'Автокомплит: паттерн combobox — role="combobox", aria-expanded, aria-activedescendant, role="listbox"/"option", стрелки, Enter и Escape; не отправлять запрос во время IME-композиции.',
@@ -1263,9 +1263,9 @@ export const TOPICS: Record<TopicId, Topic> = {
       {
         label: t('Outbox для записи', 'Outbox for writes', 'Outbox dla zapisu'),
         body: t(
-          'Действие {clientId, тип, payload, время, попытки} сохраняется в IndexedDB до того, как UI скажет «сохранено». Очередь проигрывается по порядку при online, на старте и по Background Sync (он не везде). Одна вкладка — лидер.',
-          'An action {clientId, type, payload, time, attempts} is persisted to IndexedDB before the UI says “saved”. The queue replays in order on online, on startup and via Background Sync (not everywhere). One tab is the leader.',
-          'Akcja {clientId, typ, payload, czas, próby} jest zapisywana w IndexedDB, zanim UI powie „zapisano”. Kolejka odtwarza się po kolei przy online, na starcie i przez Background Sync (nie wszędzie). Jedna karta jest liderem.',
+          'Действие {clientId, тип, payload, время, попытки} сохраняется в IndexedDB до того, как UI скажет «сохранено». Очередь проигрывается по порядку при online, на старте и по Background Sync (только Chromium; для Safari и Firefox обязателен fallback на online и старт приложения). Одна вкладка — лидер.',
+          'An action {clientId, type, payload, time, attempts} is persisted to IndexedDB before the UI says “saved”. The queue replays in order on online, on startup and via Background Sync (Chromium only; a fallback to online and app start is mandatory for Safari and Firefox). One tab is the leader.',
+          'Akcja {clientId, typ, payload, czas, próby} jest zapisywana w IndexedDB, zanim UI powie „zapisano”. Kolejka odtwarza się po kolei przy online, na starcie i przez Background Sync (tylko Chromium; dla Safari i Firefoksa fallback na online i start aplikacji jest obowiązkowy). Jedna karta jest liderem.',
         ),
       },
       {

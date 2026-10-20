@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { isSessionComplete } from '../content/questions'
+import { TOPIC_ORDER } from '../content/topics'
 import type {
   AppMode,
   Locale,
@@ -37,17 +38,7 @@ const PREP_STORAGE = 'fe-arch-trainer-prep'
 const STEP_SET = new Set<SessionStep>(STEPS)
 const RADIO_STEP_SET = new Set<RadioStep>(RADIO_STEPS)
 const CASE_SET = new Set<RadioCaseId>(['feed', 'autocomplete', 'chat', 'dashboard', 'shop', 'kanban'])
-const TOPIC_SET = new Set<TopicId>([
-  'structure',
-  'state',
-  'rendering',
-  'api',
-  'scale',
-  'perf',
-  'reliability',
-  'security',
-  'leadership',
-])
+const TOPIC_SET = new Set<TopicId>(TOPIC_ORDER)
 
 function readSearch() {
   return new URLSearchParams(window.location.search)
@@ -80,7 +71,7 @@ function radioCaseFromUrl(): RadioCaseId | null {
 function topicFromUrl(): TopicId {
   const raw = readSearch().get('topic')
   if (raw && TOPIC_SET.has(raw as TopicId)) return raw as TopicId
-  return 'structure'
+  return TOPIC_ORDER[0]
 }
 
 function localeFromStorage(): Locale {
