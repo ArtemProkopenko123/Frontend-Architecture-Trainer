@@ -11,6 +11,8 @@ describe('RADIO_CASES', () => {
       .join(' ')
 
     expect(guidance).not.toContain('aria-grabbed')
+    expect(guidance).toContain('live region')
+    expect(RADIO_CASES.kanban.optimizations.some((text) => text.pl.includes('Przenieś'))).toBe(true)
   })
 
   it('defines the radio cases including shop and kanban', () => {

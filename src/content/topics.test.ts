@@ -58,6 +58,7 @@ describe('TOPICS', () => {
       .join(' ')
 
     expect(guidance).not.toContain('Recoil')
+    expect(guidance).toContain('Jotai')
   })
 
   it('every topic has checks, structure, sample and at least one related card', () => {

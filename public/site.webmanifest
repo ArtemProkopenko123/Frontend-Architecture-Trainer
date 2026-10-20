@@ -1,7 +1,7 @@
 {
   "name": "Frontend architecture trainer",
   "short_name": "FE trainer",
-  "description": "Senior frontend architecture interview trainer in Russian, English and Polish.",
+  "description": "Senior frontend architecture interview trainer in Russian and English; Polish beta with English fallback.",
   "lang": "en",
   "start_url": "/",
   "display": "standalone",

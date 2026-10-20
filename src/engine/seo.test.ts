@@ -31,6 +31,7 @@ describe('buildDocumentSeo', () => {
     expect(seo.title.toLowerCase()).toMatch(/frontend architecture trainer/)
     expect(seo.title).toMatch(/Pipeline/)
     expect(seo.description.toLowerCase()).toMatch(/radio|guide|context/)
+    expect(seo.description).toContain('Polish beta with English fallback')
     expect(seo.jsonLd['@type']).toBe('WebApplication')
     expect(seo.jsonLd.applicationCategory).toBe('EducationalApplication')
     expect(seo.jsonLd.inLanguage).toEqual(['ru', 'en', 'pl'])

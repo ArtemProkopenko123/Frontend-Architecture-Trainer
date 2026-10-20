@@ -14,7 +14,7 @@ export const ui = {
   langRu: { ru: 'RU', en: 'RU', pl: 'RU' },
   langEn: { ru: 'EN', en: 'EN', pl: 'EN' },
   langPl: { ru: 'PL', en: 'PL', pl: 'PL' },
-  langPlBeta: { ru: 'Польский — бета', en: 'Polish — beta', pl: 'Polski — beta' },
+  langPlBeta: { ru: 'PL — польский, бета', en: 'PL — Polish, beta', pl: 'PL — polski, beta' },
   languageGroup: { ru: 'Язык', en: 'Language', pl: 'Język' },
   modeGroup: { ru: 'Режим', en: 'Mode', pl: 'Tryb' },
   skipToContent: { ru: 'К содержимому', en: 'Skip to content', pl: 'Przejdź do treści' },
