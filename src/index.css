@@ -35,6 +35,21 @@ button {
   cursor: pointer;
 }
 
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 20;
+  padding: 8px 12px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -42,41 +57,50 @@ button {
 }
 
 .topbar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) auto minmax(160px, 220px) auto;
+  grid-template-areas: "brand modes search lang";
   align-items: center;
-  justify-content: space-between;
-  gap: 12px 24px;
-  padding: 16px 28px;
+  gap: 10px 16px;
+  padding: 12px 24px;
   border-bottom: 1px solid var(--line);
   background: var(--panel);
   flex-shrink: 0;
 }
 
-.topbar > div:first-child {
-  flex: 1 1 200px;
+.topbar-brand {
+  grid-area: brand;
   min-width: 0;
+}
+
+.mode-scroll {
+  grid-area: modes;
+  min-width: 0;
+}
+
+.search-box {
+  grid-area: search;
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.lang-toggle {
+  grid-area: lang;
+  justify-self: end;
 }
 
 .topbar h1 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .topbar p {
   margin: 4px 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.topbar-actions {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 10px;
-  justify-content: flex-end;
-  flex: 1 1 auto;
+  font-size: 0.9rem;
 }
 
 .locale-toggle {
@@ -428,13 +452,6 @@ button {
   margin: 12px 0 20px;
 }
 
-.search-box {
-  position: relative;
-  flex: 1 1 180px;
-  min-width: 160px;
-  max-width: 240px;
-}
-
 .search-box input {
   display: block;
   box-sizing: border-box;
@@ -513,28 +530,67 @@ button {
   display: none;
 }
 
+@media (max-width: 1100px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand lang"
+      "modes modes"
+      "search search";
+    align-items: start;
+  }
+
+  .topbar-brand {
+    padding-right: 8px;
+  }
+
+  .mode-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .mode-toggle {
+    width: max-content;
+  }
+}
+
 @media (max-width: 960px) {
   .workspace {
     grid-template-columns: 1fr;
   }
 
   .topbar {
-    flex-direction: column;
+    padding: 12px 16px;
   }
 
-  .topbar-actions {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .search-box {
-    flex: 1 1 100%;
-    max-width: none;
+  .stepper,
+  .round-timer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .wizard-pane {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    padding: 16px 16px 32px;
+  }
+
+  .diagram-pane {
+    padding: 12px 16px 24px;
+  }
+
+  .diagram-canvas {
+    height: min(52vh, 420px);
+  }
+
+  .nav-row {
+    flex-wrap: wrap;
+  }
+
+  .nav-row button,
+  .primary {
+    flex: 1 1 auto;
   }
 
   .radio-stepper {
@@ -558,6 +614,54 @@ button {
   }
 
   .prep-stepper button:nth-child(n + 4) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar h1 {
+    font-size: 1.05rem;
+  }
+
+  .topbar p {
+    font-size: 0.8rem;
+  }
+
+  .locale-toggle button {
+    padding: 0 12px;
+    min-height: 40px;
+    line-height: 40px;
+  }
+
+  .search-box input {
+    height: 40px;
+  }
+
+  .choices button {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .option-card {
+    padding: 12px;
+  }
+
+  .radio-stepper,
+  .prep-stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .radio-stepper button:nth-child(3),
+  .prep-stepper button:nth-child(3) {
+    border-right: 1px solid var(--line);
+  }
+
+  .radio-stepper button:nth-child(even),
+  .prep-stepper button:nth-child(even) {
+    border-right: 0;
+  }
+
+  .radio-stepper button:nth-child(n + 3),
+  .prep-stepper button:nth-child(n + 3) {
     border-top: 1px solid var(--line);
   }
 }

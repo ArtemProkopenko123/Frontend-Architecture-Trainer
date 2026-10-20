@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { AppMode } from '../../content/types'
+import { applyDocumentSeo } from '../../engine/seo'
 import { t, ui } from '../../i18n/ui'
 import { SearchBox } from '../search/SearchBox'
 import {
@@ -45,6 +46,16 @@ export function AppShell() {
   )
 
   useEffect(() => {
+    applyDocumentSeo({
+      locale,
+      mode,
+      origin: window.location.origin,
+      path: window.location.pathname,
+      search: window.location.search,
+    })
+  }, [locale, mode, step, radioStep, radioCaseId, prepSection, topicId])
+
+  useEffect(() => {
     const heading = document.querySelector('.wizard-pane h2')
     if (!(heading instanceof HTMLElement)) return
     heading.tabIndex = -1
@@ -53,13 +64,16 @@ export function AppShell() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        {t(ui.skipToContent, locale)}
+      </a>
       <header className="topbar">
-        <div>
+        <div className="topbar-brand">
           <h1>{t(ui.appTitle, locale)}</h1>
           <p>{t(subtitle(mode), locale)}</p>
         </div>
-        <div className="topbar-actions">
-          <div className="locale-toggle" role="group" aria-label="Mode">
+        <div className="mode-scroll">
+          <div className="locale-toggle mode-toggle" role="group" aria-label={t(ui.modeGroup, locale)}>
             {MODES.map((item) => (
               <button
                 key={item}
@@ -71,30 +85,30 @@ export function AppShell() {
               </button>
             ))}
           </div>
-          <SearchBox />
-          <div className="locale-toggle" role="group" aria-label={t(ui.languageGroup, locale)}>
-            <button
-              type="button"
-              className={locale === 'ru' ? 'active' : ''}
-              onClick={() => setLocale('ru')}
-            >
-              {ui.langRu.ru}
-            </button>
-            <button
-              type="button"
-              className={locale === 'en' ? 'active' : ''}
-              onClick={() => setLocale('en')}
-            >
-              {ui.langEn.en}
-            </button>
-            <button
-              type="button"
-              className={locale === 'pl' ? 'active' : ''}
-              onClick={() => setLocale('pl')}
-            >
-              {ui.langPl.pl}
-            </button>
-          </div>
+        </div>
+        <SearchBox />
+        <div className="locale-toggle lang-toggle" role="group" aria-label={t(ui.languageGroup, locale)}>
+          <button
+            type="button"
+            className={locale === 'ru' ? 'active' : ''}
+            onClick={() => setLocale('ru')}
+          >
+            {ui.langRu.ru}
+          </button>
+          <button
+            type="button"
+            className={locale === 'en' ? 'active' : ''}
+            onClick={() => setLocale('en')}
+          >
+            {ui.langEn.en}
+          </button>
+          <button
+            type="button"
+            className={locale === 'pl' ? 'active' : ''}
+            onClick={() => setLocale('pl')}
+          >
+            {ui.langPl.pl}
+          </button>
         </div>
       </header>
       {mode === 'pipeline' ? (
@@ -156,7 +170,7 @@ export function AppShell() {
           ))}
         </nav>
       ) : null}
-      <main className="workspace">
+      <main id="main-content" className="workspace">
         <section className="wizard-pane">
           {mode === 'guide' ? <GuidePanel /> : null}
           {mode === 'pipeline' ? <Wizard /> : null}

@@ -15,6 +15,8 @@ export const ui = {
   langEn: { ru: 'EN', en: 'EN', pl: 'EN' },
   langPl: { ru: 'PL', en: 'PL', pl: 'PL' },
   languageGroup: { ru: 'Язык', en: 'Language', pl: 'Język' },
+  modeGroup: { ru: 'Режим', en: 'Mode', pl: 'Tryb' },
+  skipToContent: { ru: 'К содержимому', en: 'Skip to content', pl: 'Przejdź do treści' },
   back: { ru: 'Назад', en: 'Back', pl: 'Wstecz' },
   next: { ru: 'Далее', en: 'Next', pl: 'Dalej' },
   start: { ru: 'Начать', en: 'Start', pl: 'Start' },
