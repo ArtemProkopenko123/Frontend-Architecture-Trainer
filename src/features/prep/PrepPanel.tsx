@@ -7,6 +7,12 @@ import {
   TRAPS_INTRO,
   TRICK_QUESTIONS,
 } from '../../content/prep'
+import { getProfile } from '../../content/profiles'
+import { isSessionComplete } from '../../content/questions'
+import { buildAnswerScript } from '../../engine/answerScript'
+import { downloadText } from '../../engine/download'
+import { buildExportMarkdown, exportFilename } from '../../engine/exportMarkdown'
+import { recommend } from '../../engine/recommend'
 import { t, ui } from '../../i18n/ui'
 import { useSessionStore } from '../../store/sessionStore'
 
@@ -37,6 +43,34 @@ export function PrepPanel() {
             />
           </label>
         ))}
+        <div className="nav-row">
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              const state = useSessionStore.getState()
+              const session = isSessionComplete(state.context) ? state.context : null
+              const profileId = state.selectedProfileId
+              downloadText(
+                exportFilename(locale),
+                buildExportMarkdown({
+                  locale,
+                  story: state.story,
+                  context: state.context,
+                  profileId,
+                  script:
+                    session && profileId
+                      ? buildAnswerScript(session, getProfile(profileId), locale)
+                      : '',
+                  notes: session ? recommend(session).notes : [],
+                  rubric: state.rubric,
+                }),
+              )
+            }}
+          >
+            {t(ui.exportMd, locale)}
+          </button>
+        </div>
       </>
     )
   }

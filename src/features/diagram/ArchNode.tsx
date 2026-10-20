@@ -11,6 +11,7 @@ export function ArchNode({ data, selected }: NodeProps<ArchFlowNode>) {
     <div
       className={selected ? 'arch-node selected' : 'arch-node'}
       role="button"
+      tabIndex={0}
       aria-label={data.label}
     >
       <Handle type="target" position={Position.Left} />

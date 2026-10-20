@@ -5,14 +5,15 @@ import {
   RADIO_OPENING,
   SPOTLIGHT_TASKS,
 } from '../../content/radio'
-import type { Locale, RadioCase, RadioCaseId, RadioStep } from '../../content/types'
+import type { Locale, Localized, RadioCase, RadioCaseId, RadioStep } from '../../content/types'
 import { t, ui } from '../../i18n/ui'
 import { useSessionStore } from '../../store/sessionStore'
+import { RubricList } from '../prep/RubricList'
 import { VoiceRecorder } from './VoiceRecorder'
 
 const CASE_IDS = Object.keys(RADIO_CASES) as RadioCaseId[]
 
-function bullets(items: { ru: string; en: string }[], locale: Locale) {
+function bullets(items: Localized[], locale: Locale) {
   return (
     <ul>
       {items.map((item) => (
@@ -93,6 +94,7 @@ export function RadioWizard() {
         <div className="script">{t(radioCase.opening, locale)}</div>
       ) : null}
       {sectionBody(radioStep, radioCase, locale)}
+      {isLast ? <RubricList /> : null}
       <div className="nav-row">
         <button type="button" className="secondary" onClick={goBack}>
           {t(ui.back, locale)}

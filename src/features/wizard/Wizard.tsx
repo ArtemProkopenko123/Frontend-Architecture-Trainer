@@ -1,36 +1,37 @@
-import { useEffect } from 'react'
-import { CONTEXT_QUESTIONS } from '../../content/questions'
+import { useEffect, useState } from 'react'
+import { CONTEXT_QUESTIONS, isSessionComplete, QUESTION_GROUPS } from '../../content/questions'
 import { getProfile } from '../../content/profiles'
-import type {
-  ArchitectureProfile,
-  ContextKey,
-  ContextQuestion,
-  Locale,
-  ProfileId,
-  SessionContext,
+import {
+  LOCALES,
+  type ArchitectureProfile,
+  type ContextKey,
+  type ContextQuestion,
+  type Locale,
+  type Localized,
+  type ProfileId,
+  type SessionContext,
 } from '../../content/types'
 import { buildAnswerScript } from '../../engine/answerScript'
+import { downloadText } from '../../engine/download'
+import { buildExportMarkdown, exportFilename } from '../../engine/exportMarkdown'
 import { recommend } from '../../engine/recommend'
 import { t, ui } from '../../i18n/ui'
 import { useSessionStore } from '../../store/sessionStore'
+import { RubricList } from '../prep/RubricList'
 import { VoiceRecorder } from '../radio/VoiceRecorder'
 
 const PROFILE_FIELDS = ['why', 'rendering', 'structure', 'repo', 'state'] as const
 
-const FIELD_LABELS: Record<(typeof PROFILE_FIELDS)[number], { ru: string; en: string }> = {
-  why: { ru: 'Почему', en: 'Why' },
-  rendering: { ru: 'Рендеринг', en: 'Rendering' },
-  structure: { ru: 'Структура', en: 'Structure' },
-  repo: { ru: 'Репозиторий', en: 'Repository' },
-  state: { ru: 'Состояние', en: 'State' },
+const FIELD_LABELS: Record<(typeof PROFILE_FIELDS)[number], Localized> = {
+  why: { ru: 'Почему', en: 'Why', pl: 'Dlaczego' },
+  rendering: { ru: 'Рендеринг', en: 'Rendering', pl: 'Rendering' },
+  structure: { ru: 'Структура', en: 'Structure', pl: 'Struktura' },
+  repo: { ru: 'Репозиторий', en: 'Repository', pl: 'Repozytorium' },
+  state: { ru: 'Состояние', en: 'State', pl: 'Stan' },
 }
 
 function completeContext(partial: Partial<SessionContext>): SessionContext | null {
-  const { teamSize, teamsCount, product, seo, dataFreshness, independentReleases } = partial
-  if (!teamSize || !teamsCount || !product || !seo || !dataFreshness || !independentReleases) {
-    return null
-  }
-  return { teamSize, teamsCount, product, seo, dataFreshness, independentReleases }
+  return isSessionComplete(partial) ? partial : null
 }
 
 function pickContextValue(
@@ -38,26 +39,7 @@ function pickContextValue(
   question: ContextQuestion,
   value: SessionContext[ContextKey],
 ) {
-  switch (question.key) {
-    case 'teamSize':
-      setContextField(question.key, value as SessionContext['teamSize'])
-      return
-    case 'teamsCount':
-      setContextField(question.key, value as SessionContext['teamsCount'])
-      return
-    case 'product':
-      setContextField(question.key, value as SessionContext['product'])
-      return
-    case 'seo':
-      setContextField(question.key, value as SessionContext['seo'])
-      return
-    case 'dataFreshness':
-      setContextField(question.key, value as SessionContext['dataFreshness'])
-      return
-    case 'independentReleases':
-      setContextField(question.key, value as SessionContext['independentReleases'])
-      return
-  }
+  setContextField(question.key, value as never)
 }
 
 function ProfileCards({
@@ -144,6 +126,40 @@ function Nav({
   )
 }
 
+function CopySessionLink({ locale }: { locale: Locale }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      type="button"
+      className="secondary"
+      onClick={() => {
+        void navigator.clipboard.writeText(window.location.href).then(() => setCopied(true))
+      }}
+    >
+      {copied ? t(ui.copied, locale) : t(ui.copyLink, locale)}
+    </button>
+  )
+}
+
+function exportDrill(locale: Locale) {
+  const state = useSessionStore.getState()
+  const session = completeContext(state.context)
+  if (!session || !state.selectedProfileId) return
+  const profile = getProfile(state.selectedProfileId)
+  downloadText(
+    exportFilename(locale),
+    buildExportMarkdown({
+      locale,
+      story: state.story,
+      context: session,
+      profileId: state.selectedProfileId,
+      script: buildAnswerScript(session, profile, locale),
+      notes: recommend(session).notes,
+      rubric: state.rubric,
+    }),
+  )
+}
+
 export function Wizard() {
   const locale = useSessionStore((s) => s.locale)
   const step = useSessionStore((s) => s.step)
@@ -156,6 +172,7 @@ export function Wizard() {
   const setSelectedProfileId = useSessionStore((s) => s.setSelectedProfileId)
   const toggleAltScript = useSessionStore((s) => s.toggleAltScript)
   const reset = useSessionStore((s) => s.reset)
+  const setMode = useSessionStore((s) => s.setMode)
 
   const session = completeContext(context)
   const recommendation = session ? recommend(session) : null
@@ -169,7 +186,7 @@ export function Wizard() {
 
   const selectedId = selectedProfileId ?? recommendation?.recommendedId ?? null
   const selectedProfile = selectedId ? getProfile(selectedId) : null
-  const altLocale: Locale = locale === 'ru' ? 'en' : 'ru'
+  const altLocale: Locale = LOCALES[(LOCALES.indexOf(locale) + 1) % LOCALES.length]
 
   if (step === 'start') {
     return (
@@ -188,9 +205,13 @@ export function Wizard() {
           <p>{t(ui.startChecks, locale)}</p>
         </div>
         <p className="note">{t(ui.headerLangNote, locale)}</p>
+        <p className="note">{t(ui.disclaimer, locale)}</p>
         <div className="nav-row">
           <button type="button" className="primary" onClick={goNext}>
             {t(ui.start, locale)}
+          </button>
+          <button type="button" className="secondary" onClick={() => setMode('guide')}>
+            {t(ui.openGuide, locale)}
           </button>
         </div>
       </>
@@ -201,21 +222,26 @@ export function Wizard() {
     return (
       <>
         <h2>{t(ui.steps.context, locale)}</h2>
-        {CONTEXT_QUESTIONS.map((question) => (
-          <div key={question.key} className="question">
-            <h3>{t(question.prompt, locale)}</h3>
-            <div className="choices">
-              {question.options.map((option) => (
-                <button
-                  key={String(option.value)}
-                  type="button"
-                  className={context[question.key] === option.value ? 'selected' : ''}
-                  onClick={() => pickContextValue(setContextField, question, option.value)}
-                >
-                  {t(option.label, locale)}
-                </button>
-              ))}
-            </div>
+        {QUESTION_GROUPS.map((group) => (
+          <div key={group.id} className="question-group">
+            <h3 className="group-title">{t(group.label, locale)}</h3>
+            {CONTEXT_QUESTIONS.filter((question) => question.group === group.id).map((question) => (
+              <div key={question.key} className="question">
+                <h3>{t(question.prompt, locale)}</h3>
+                <div className="choices">
+                  {question.options.map((option) => (
+                    <button
+                      key={String(option.value)}
+                      type="button"
+                      className={context[question.key] === option.value ? 'selected' : ''}
+                      onClick={() => pickContextValue(setContextField, question, option.value)}
+                    >
+                      {t(option.label, locale)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ))}
         {!session ? <p className="warn">{t(ui.needContext, locale)}</p> : null}
@@ -251,6 +277,16 @@ export function Wizard() {
           selectedProfileId={selectedProfileId}
           onSelect={setSelectedProfileId}
         />
+        {recommendation.notes.length > 0 ? (
+          <div className="checks">
+            <strong>{t(ui.constructorNotes, locale)}</strong>
+            <ul>
+              {recommendation.notes.map((note) => (
+                <li key={note.ru}>{t(note, locale)}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <Nav
           locale={locale}
           showBack
@@ -259,6 +295,9 @@ export function Wizard() {
           onBack={goBack}
           onNext={goNext}
         />
+        <div className="nav-row">
+          <CopySessionLink locale={locale} />
+        </div>
       </>
     )
   }
@@ -342,7 +381,12 @@ export function Wizard() {
         <button type="button" className="primary" onClick={reset}>
           {t(ui.restart, locale)}
         </button>
+        <CopySessionLink locale={locale} />
+        <button type="button" className="secondary" onClick={() => exportDrill(locale)}>
+          {t(ui.exportMd, locale)}
+        </button>
       </div>
+      <RubricList />
       <VoiceRecorder />
     </>
   )

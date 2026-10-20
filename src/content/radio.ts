@@ -12,7 +12,7 @@ export const RADIO_STEPS: RadioStep[] = [
 
 export const RADIO_OPENING = t(
   'Прежде чем рисовать, хочу уточнить требования. Какие основные сценарии? Какие устройства и сеть — мобильный интернет учитываем? Нужно ли SEO? Какой порядок объёма данных? Нужен ли realtime и офлайн? Предлагаю сфокусироваться на A и B, а C вынести за скоуп — согласны?',
-  'Before I start drawing, I would like to clarify the requirements. What are the core user flows? Which devices and networks — do we care about slow mobile connections? Is SEO important? What is the rough data volume? Do we need real-time updates or offline support? I suggest we focus on A and B and leave C out of scope — does that work?',
+  'Before I start drawing, I would like to clarify the requirements. What are the core user flows? Which devices and networks — do we care about slow mobile connections? Is SEO important? What is the rough data volume? Do we need real-time updates or offline support? I suggest we focus on A and B and leave C out of scope — does that work?', 'Zanim zacznę rysować, chcę doprecyzować wymagania. Jakie są główne scenariusze? Jakie urządzenia i sieć — czy liczy się wolny mobile? Czy SEO jest ważne? Jaka jest rzędu wielkość danych? Czy potrzebny jest realtime i offline? Proponuję skupić się na A i B, a C wyłączyć ze scope — zgoda?',
 )
 
 const TIME_HINT = t(
@@ -23,10 +23,10 @@ const TIME_HINT = t(
 export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
   feed: {
     id: 'feed',
-    title: t('Новостная лента', 'News feed'),
+    title: t('Новостная лента', 'News feed', 'Feed newsów'),
     summary: t(
       'Бесконечная лента постов: Query-кэш как единственный источник для UI, SSE обновляет кэш, лайк — оптимистично.',
-      'Infinite post feed: Query cache is the only UI source, SSE updates the cache, likes are optimistic.',
+      'Infinite post feed: Query cache is the only UI source, SSE updates the cache, likes are optimistic.', 'Nieskończony feed postów: cache Query to jedyne źródło UI, SSE aktualizuje cache, like jest optymistyczny.',
     ),
     timeHint: TIME_HINT,
     opening: RADIO_OPENING,
@@ -152,7 +152,7 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
   },
   autocomplete: {
     id: 'autocomplete',
-    title: t('Автокомплит / поиск с подсказками', 'Autocomplete / typeahead search'),
+    title: t('Автокомплит / поиск с подсказками', 'Autocomplete / typeahead search', 'Autocomplete / wyszukiwarka z podpowiedziami'),
     summary: t(
       'Combobox с debounce, AbortController против гонок, LRU-кэш подсказок и доступный ARIA-паттерн.',
       'Combobox with debounce, AbortController against races, an LRU of suggestions, and an ARIA combobox pattern.',
@@ -233,7 +233,7 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
   },
   chat: {
     id: 'chat',
-    title: t('Чат / мессенджер', 'Chat / messenger'),
+    title: t('Чат / мессенджер', 'Chat / messenger', 'Czat / komunikator'),
     summary: t(
       'Нормализованный стор, WebSocket с реконнектом, история по курсору вверх, офлайн-очередь в IndexedDB.',
       'Normalised store, WebSocket with reconnect, cursor history upwards, offline queue in IndexedDB.',
@@ -329,7 +329,7 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
   },
   dashboard: {
     id: 'dashboard',
-    title: t('Дашборд с графиками и фильтрами', 'Dashboard with charts and filters'),
+    title: t('Дашборд с графиками и фильтрами', 'Dashboard with charts and filters', 'Dashboard z wykresami i filtrami'),
     summary: t(
       'Фильтры в URL, реестр виджетов, независимый Query на виджет, агрегация на API, Worker для тяжёлого расчёта.',
       'Filters in the URL, widget registry, independent Query per widget, aggregation on the API, a Worker for heavy calc.',
@@ -407,10 +407,166 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
       edges: [
         edge('url', 'registry', t('фильтры', 'filters')),
         edge('registry', 'query', t('ключ виджета', 'widget key')),
-        edge('query', 'api', t('агрегация', 'aggregation')),
+        edge('query', 'api', t('агрегация', 'aggregation', 'agregacja')),
         edge('api', 'query', t('series', 'series')),
         edge('query', 'worker', t('тяжёлый расчёт', 'heavy calc')),
         edge('worker', 'registry', t('точки для canvas', 'points for canvas')),
+      ],
+    },
+  },
+  shop: {
+    id: 'shop',
+    title: t('Интернет-магазин / каталог', 'Online shop / catalogue', 'Sklep internetowy / katalog'),
+    summary: t(
+      'Каталог с SEO: ISR/SSR, фильтры в URL, гостевая корзина, оплата вне скоупа.',
+      'SEO catalogue: ISR/SSR, filters in the URL, guest cart, payment out of scope.',
+    ),
+    timeHint: TIME_HINT,
+    opening: RADIO_OPENING,
+    requirements: [
+      t('Каталог и карточка товара индексируются; фильтры шарятся ссылкой.', 'Catalogue and product page are indexed; filters are shareable via URL.'),
+      t('Корзина для гостя, после логина сливается с серверной.', 'Guest cart merges with the server cart after login.'),
+      t('Mobile web, медленная сеть учитываем.', 'Mobile web, slow networks count.'),
+      t('Вне скоупа: платёжный шлюз и личный кабинет продавца.', 'Out of scope: payment gateway and seller cabinet.'),
+    ],
+    architecture: [
+      t('Каталог — ISR/SSR, карточка — ISR по событию, кабинет покупателя — CSR.', 'Catalogue is ISR/SSR, product page ISR on event, buyer account is CSR.'),
+      t('Фильтры и сортировка живут в URL; листинг читает Query по ключу из search params.', 'Filters and sort live in the URL; the listing reads Query keyed by search params.'),
+      t('Корзина — клиентский стор + persist; после логина merge API.', 'Cart is a client store plus persist; merge API after login.'),
+    ],
+    data: [
+      t('Product { id, slug, title, price, image, inStock }.', 'Product { id, slug, title, price, image, inStock }.'),
+      t('CartItem { productId, qty }; гость — local/IndexedDB, юзер — сервер.', 'CartItem { productId, qty }; guest — local/IndexedDB, user — server.'),
+      t('Facet counts приходят с листингом, не считаются на клиенте.', 'Facet counts arrive with the listing, not computed on the client.'),
+    ],
+    api: [
+      t('GET /catalog?filters&cursor — items + nextCursor + facets.', 'GET /catalog?filters&cursor — items + nextCursor + facets.'),
+      t('GET /product/:slug — ISR HTML + клиентский inStock через Query.', 'GET /product/:slug — ISR HTML + client inStock via Query.'),
+      t('POST /cart/merge — идемпотентный merge гостевой корзины.', 'POST /cart/merge — idempotent merge of the guest cart.'),
+    ],
+    optimizations: [
+      t('Hero и LCP картинка товара: preload, размеры против CLS.', 'Hero and product LCP image: preload, sizes against CLS.'),
+      t('Streaming оболочки каталога, фильтры не блокируют HTML.', 'Stream the catalogue shell; filters do not block HTML.'),
+      t('Виртуализация длинной выдачи; prefetch соседней страницы.', 'Virtualise a long listing; prefetch the next page.'),
+      t('a11y фильтров: fieldset, клавиатура, live region для числа товаров.', 'Filter a11y: fieldset, keyboard, live region for result count.'),
+    ],
+    diagram: {
+      nodes: [
+        node(
+          'cdn',
+          'cdn',
+          t('CDN / ISR', 'CDN / ISR'),
+          t('Каталог и карточка как кэшируемый HTML.', 'Catalogue and product as cacheable HTML.'),
+          t('CSR, если SEO не нужен.', 'CSR if SEO is not needed.'),
+          t('Какой TTL и какой тег инвалидации у карточки?', 'What TTL and invalidation tag does the product page use?'),
+        ),
+        node(
+          'app',
+          'app',
+          t('Listing / PDP', 'Listing / PDP'),
+          t('Фильтры из URL, страница не держит второй стор выдачи.', 'Filters from the URL; the page does not keep a second listing store.'),
+          t('Локальный useState фильтров, если шарить ссылку не нужно.', 'Local useState for filters if shareable links are not needed.'),
+          t('Как не устроить водопад запросов фасетов?', 'How do you avoid a facet request waterfall?'),
+        ),
+        node(
+          'query',
+          'query',
+          t('TanStack Query', 'TanStack Query'),
+          t('Листинг и остаток на складе — кэш Query.', 'Listing and stock live in the Query cache.'),
+          t('Сырой fetch в компоненте карточки.', 'Raw fetch inside the product card.'),
+          t('Какой ключ у листинга, когда меняется только сортировка?', 'What is the listing key when only sort changes?'),
+        ),
+        node(
+          'cart',
+          'store',
+          t('Корзина', 'Cart'),
+          t('Гость локально, после логина merge на сервер.', 'Guest locally, merge to the server after login.'),
+          t('Только серверная корзина и логаут-стенка.', 'Server-only cart and a login wall.'),
+          t('Что если merge конфликтует по qty?', 'What if merge conflicts on qty?'),
+        ),
+      ],
+      edges: [
+        edge('cdn', 'app', t('HTML', 'HTML')),
+        edge('app', 'query', t('listing key', 'listing key')),
+        edge('query', 'cart', t('добавить', 'add')),
+      ],
+    },
+  },
+  kanban: {
+    id: 'kanban',
+    title: t('Канбан-доска', 'Kanban board', 'Tablica kanban'),
+    summary: t(
+      'Колонки и карточки: оптимистичный порядок, fractional indexing, realtime, a11y перетаскивания.',
+      'Columns and cards: optimistic order, fractional indexing, realtime, drag a11y.',
+    ),
+    timeHint: TIME_HINT,
+    opening: RADIO_OPENING,
+    requirements: [
+      t('Несколько колонок, перенос карточки, порядок внутри колонки.', 'Several columns, move a card, order inside a column.'),
+      t('Realtime: видишь чужой перенос без перезагрузки.', 'Realtime: you see someone else move a card without a reload.'),
+      t('Клавиатура: перемещение без мыши.', 'Keyboard: move cards without a mouse.'),
+      t('Вне скоупа: вложения файлов и отчёты.', 'Out of scope: file attachments and reports.'),
+    ],
+    architecture: [
+      t('BoardPage → ColumnList → Card; источник правды колонок — Query, порядок — мутация.', 'BoardPage → ColumnList → Card; column source of truth is Query, order is a mutation.'),
+      t('Realtime события пишут в кэш Query, не во второй стор.', 'Realtime events write into the Query cache, not a second store.'),
+      t('Drag-and-drop через библиотеку с keyboard sensors.', 'Drag-and-drop with a library that has keyboard sensors.'),
+    ],
+    data: [
+      t('Card { id, columnId, rank, title } — rank дробный (fractional indexing).', 'Card { id, columnId, rank, title } — fractional rank.'),
+      t('Column { id, title, wipLimit? }.', 'Column { id, title, wipLimit? }.'),
+      t('Не нормализовать вручную, если карточек сотни; при тысячах — entity adapter / нормализация.', 'Do not hand-normalise at hundreds of cards; at thousands use an entity adapter.'),
+    ],
+    api: [
+      t('GET /board/:id → columns + cards.', 'GET /board/:id → columns + cards.'),
+      t('PATCH /cards/:id { columnId, rank } — идемпотентно по revision.', 'PATCH /cards/:id { columnId, rank } — idempotent on revision.'),
+      t('WS/SSE card.moved; конфликт — 409 и refetch.', 'WS/SSE card.moved; conflict is 409 then refetch.'),
+    ],
+    optimizations: [
+      t('Оптимистичный rank, откат при 409.', 'Optimistic rank, rollback on 409.'),
+      t('Виртуализация длинной колонки.', 'Virtualise a long column.'),
+      t('Один сокет на вкладки через BroadcastChannel/SharedWorker.', 'One socket across tabs via BroadcastChannel/SharedWorker.'),
+      t('a11y: aria-grabbed, live region «карточка в колонке Review».', 'a11y: aria-grabbed, live region “card moved to Review”.'),
+    ],
+    diagram: {
+      nodes: [
+        node(
+          'board',
+          'ui',
+          t('BoardPage', 'BoardPage'),
+          t('Собирает колонки, не считает rank.', 'Composes columns, does not compute rank.'),
+          t('Один гигантский список без колонок.', 'One giant list without columns.'),
+          t('Где живёт WIP-лимит — UI или сервер?', 'Where does the WIP limit live — UI or server?'),
+        ),
+        node(
+          'query',
+          'query',
+          t('TanStack Query', 'TanStack Query'),
+          t('Карточки и колонки в кэше; realtime делает setQueryData.', 'Cards and columns in cache; realtime uses setQueryData.'),
+          t('Отдельный realtime-стор.', 'A separate realtime store.'),
+          t('Как мержите чужой move с локальным optimistic?', 'How do you merge a remote move with local optimistic state?'),
+        ),
+        node(
+          'live',
+          'realtime',
+          t('WS / SSE', 'WS / SSE'),
+          t('События card.moved в кэш.', 'card.moved events into the cache.'),
+          t('Polling раз в 10 секунд, если коллаборация редкая.', 'Poll every 10s if collaboration is rare.'),
+          t('Что после реконнекта — snapshot или лог событий?', 'After reconnect — a snapshot or an event log?'),
+        ),
+        node(
+          'api',
+          'api',
+          t('PATCH rank', 'PATCH rank'),
+          t('Сервер сериализует порядок, 409 при конфликте revision.', 'The server serialises order, 409 on revision conflict.'),
+          t('Клиент сам перенумеровывает всех соседей целыми.', 'The client reindexes every neighbour with integers.'),
+          t('Как не кончатся дробные rank?', 'How do you avoid running out of fractional ranks?'),
+        ),
+      ],
+      edges: [
+        edge('board', 'query', t('карточки', 'cards')),
+        edge('live', 'query', t('setQueryData', 'setQueryData')),
+        edge('query', 'api', t('PATCH', 'PATCH')),
       ],
     },
   },
@@ -422,46 +578,32 @@ export function getRadioCase(id: RadioCaseId): RadioCase {
 
 export const SPOTLIGHT_TASKS: SpotlightTask[] = [
   {
-    title: t('Совместный редактор (Google Docs)', 'Collaborative editor (Google Docs)'),
+    title: t('Совместный редактор (Google Docs)', 'Collaborative editor (Google Docs)', 'Wspólny edytor (Google Docs)'),
     themes: t('CRDT/OT (Yjs), presence, конфликты, офлайн', 'CRDT/OT (Yjs), presence, conflicts, offline'),
   },
   {
-    title: t('Интернет-магазин / каталог', 'Online shop / catalogue'),
-    themes: t(
-      'SSR/ISR и SEO, фильтры в URL, корзина (гость → логин), оплата',
-      'SSR/ISR and SEO, filters in the URL, cart (guest → login), payment',
-    ),
-  },
-  {
-    title: t('Загрузка файлов (Google Drive)', 'File upload (Google Drive)'),
+    title: t('Загрузка файлов (Google Drive)', 'File upload (Google Drive)', 'Upload plików (Google Drive)'),
     themes: t(
       'Chunked/resumable upload, прогресс, параллелизм, отмена, превью',
       'Chunked/resumable upload, progress, parallelism, cancel, preview',
     ),
   },
   {
-    title: t('Видео-плеер (YouTube)', 'Video player (YouTube)'),
+    title: t('Видео-плеер (YouTube)', 'Video player (YouTube)', 'Odtwarzacz wideo (YouTube)'),
     themes: t(
       'Adaptive streaming (HLS/DASH), буферизация, доступность, аналитика',
       'Adaptive streaming (HLS/DASH), buffering, accessibility, analytics',
     ),
   },
   {
-    title: t('Канбан-доска (Trello)', 'Kanban board (Trello)'),
-    themes: t(
-      'Drag-and-drop, оптимистичный порядок (fractional indexing), realtime',
-      'Drag-and-drop, optimistic order (fractional indexing), realtime',
-    ),
-  },
-  {
-    title: t('Календарь', 'Calendar'),
+    title: t('Календарь', 'Calendar', 'Kalendarz'),
     themes: t(
       'Часовые пояса, повторяющиеся события, раскладка пересечений',
       'Time zones, recurring events, overlap layout',
     ),
   },
   {
-    title: t('Таблица с большими данными', 'Large data table'),
+    title: t('Таблица с большими данными', 'Large data table', 'Tabela z dużymi danymi'),
     themes: t(
       'Виртуализация строк и колонок, серверная сортировка/фильтрация',
       'Row and column virtualisation, server-side sort/filter',
@@ -470,8 +612,8 @@ export const SPOTLIGHT_TASKS: SpotlightTask[] = [
 ]
 
 export const RADIO_MISTAKES = [
-  t('Сразу рисовать компоненты без требований.', 'Start drawing components without requirements.'),
-  t('Уйти глубоко в одну деталь и не успеть остальное.', 'Go deep on one detail and run out of time for the rest.'),
-  t('Не говорить вслух.', 'Stay silent instead of thinking out loud.'),
-  t('Забыть про ошибки, доступность и мобильные устройства.', 'Forget errors, accessibility and mobile devices.'),
+  t('Сразу рисовать компоненты без требований.', 'Start drawing components without requirements.', 'Zacząć rysować komponenty bez wymagań.'),
+  t('Уйти глубоко в одну деталь и не успеть остальное.', 'Go deep on one detail and run out of time for the rest.', 'Wejść głęboko w jeden szczegół i zabraknąć czasu na resztę.'),
+  t('Не говорить вслух.', 'Stay silent instead of thinking out loud.', 'Milczeć zamiast myśleć na głos.'),
+  t('Забыть про ошибки, доступность и мобильные устройства.', 'Forget errors, accessibility and mobile devices.', 'Zapomnieć o błędach, dostępności i urządzeniach mobilnych.'),
 ]

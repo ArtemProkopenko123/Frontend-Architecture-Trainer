@@ -1,4 +1,5 @@
 import { edge, node, t } from './diagram'
+import { TEXTBOOK } from './textbook'
 import type { Topic, TopicId } from './types'
 
 export const TOPIC_ORDER: TopicId[] = [
@@ -16,11 +17,12 @@ export const TOPIC_ORDER: TopicId[] = [
 export const TOPICS: Record<TopicId, Topic> = {
   structure: {
     id: 'structure',
-    title: t('Структура кода и модульность', 'Code structure and modularity'),
+    title: t('Структура кода и модульность', 'Code structure and modularity', 'Struktura kodu i modularność'),
     thesis: t(
       'Структура папок вторична, главное — границы модулей и направление зависимостей. Группируй код по фичам и бизнес-доменам, а не по техническим типам, и проверяй правила импортов автоматически.',
-      'Folder layout is secondary; what matters is module boundaries and dependency direction. Group by features and domains, not by technical type, and enforce import rules automatically.',
+      'Folder layout is secondary; what matters is module boundaries and dependency direction. Group by features and domains, not by technical type, and enforce import rules automatically.', 'Układ folderów jest wtórny; liczą się granice modułów i kierunek zależności. Grupuj kod według funkcji i domen, nie typów technicznych, i egzekwuj reguły importów automatycznie.',
     ),
+    ...TEXTBOOK.structure,
     rows: [
       {
         label: t('By type', 'By type'),
@@ -122,14 +124,15 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   state: {
     id: 'state',
-    title: t('Управление состоянием', 'State management'),
+    title: t('Управление состоянием', 'State management', 'Zarządzanie stanem'),
     thesis: t(
       'Состояние бывает разных видов, и у каждого своё место. Большинство «глобального стейта» на самом деле — кэш серверных данных, и ему место в TanStack Query или RTK Query, а не в Redux.',
-      'There are several kinds of state, and each has a place. Most “global state” is actually a server-data cache and belongs in TanStack Query or RTK Query, not in Redux.',
+      'There are several kinds of state, and each has a place. Most “global state” is actually a server-data cache and belongs in TanStack Query or RTK Query, not in Redux.', 'Stan bywa różnego rodzaju i każdy ma swoje miejsce. Większość „globalnego stanu” to tak naprawdę cache danych serwera i należy do TanStack Query albo RTK Query, nie do Redux.',
     ),
+    ...TEXTBOOK.state,
     rows: [
       {
-        label: t('Серверное', 'Server'),
+        label: t('Серверное', 'Server', 'Serwerowe'),
         body: t(
           'Списки, профиль, заказы — TanStack Query / RTK Query / SWR: кэш, дедупликация, фоновое обновление.',
           'Lists, profile, orders — TanStack Query / RTK Query / SWR: cache, deduplication, background refresh.',
@@ -143,25 +146,25 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       },
       {
-        label: t('Локальное UI', 'Local UI'),
+        label: t('Локальное UI', 'Local UI', 'Lokalne UI'),
         body: t(
           'Открыт ли dropdown, ввод в поле — useState / useReducer в компоненте.',
           'Dropdown open, field input — useState / useReducer in the component.',
         ),
       },
       {
-        label: t('Формы', 'Forms'),
+        label: t('Формы', 'Forms', 'Formularze'),
         body: t('Значения, валидация, dirty/touched — React Hook Form + Zod.', 'Values, validation, dirty/touched — React Hook Form + Zod.'),
       },
       {
-        label: t('Глобальное клиентское', 'Global client'),
+        label: t('Глобальное клиентское', 'Global client', 'Globalne klienckie'),
         body: t(
           'Тема, корзина до оформления, сессия, сложный редактор — Zustand / Redux Toolkit / Jotai; редко меняющееся — Context.',
           'Theme, cart before checkout, session, a complex editor — Zustand / Redux Toolkit / Jotai; rarely changing data — Context.',
         ),
       },
       {
-        label: t('Производное', 'Derived'),
+        label: t('Производное', 'Derived', 'Pochodne'),
         body: t(
           'Сумма корзины, отфильтрованный список — не хранить, вычислять (useMemo, селекторы).',
           'Cart total, a filtered list — do not store, compute (useMemo, selectors).',
@@ -230,7 +233,7 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       ],
       edges: [
-        edge('query', 'local', t('хуки данных', 'data hooks')),
+        edge('query', 'local', t('хуки данных', 'data hooks', 'hooki danych')),
         edge('url', 'local', t('фильтры', 'filters')),
         edge('zustand', 'local', t('узкий клиентский срез', 'thin client slice')),
       ],
@@ -238,11 +241,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   rendering: {
     id: 'rendering',
-    title: t('Рендеринг: CSR, SSR, SSG, ISR, RSC', 'Rendering: CSR, SSR, SSG, ISR, RSC'),
+    title: t('Рендеринг: CSR, SSR, SSG, ISR, RSC', 'Rendering: CSR, SSR, SSG, ISR, RSC', 'Rendering: CSR, SSR, SSG, ISR, RSC'),
     thesis: t(
       'Стратегию рендеринга выбирают по странице, а не по проекту: маркетинг — статика, каталог — ISR/SSR, личный кабинет — CSR. Главные критерии: SEO, свежесть данных, персонализация, стоимость серверов.',
-      'Pick a rendering strategy per page, not per project: marketing is static, catalogue is ISR/SSR, the account area is CSR. The main criteria are SEO, data freshness, personalisation and server cost.',
+      'Pick a rendering strategy per page, not per project: marketing is static, catalogue is ISR/SSR, the account area is CSR. The main criteria are SEO, data freshness, personalisation and server cost.', 'Strategię renderingu wybiera się per strona, nie per projekt: marketing — statyka, katalog — ISR/SSR, konto — CSR. Główne kryteria: SEO, świeżość danych, personalizacja, koszt serwerów.',
     ),
+    ...TEXTBOOK.rendering,
     rows: [
       {
         label: t('CSR (SPA)', 'CSR (SPA)'),
@@ -338,28 +342,29 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   api: {
     id: 'api',
-    title: t('Слой данных и API', 'Data layer and API'),
+    title: t('Слой данных и API', 'Data layer and API', 'Warstwa danych i API'),
     thesis: t(
       'Компоненты не должны знать про fetch, URL и формат ответа сервера. Между ними — слой API с типизированным клиентом, маппингом DTO в доменные модели и единой обработкой ошибок.',
-      'Components must not know about fetch, URLs or the server response shape. Between them sits an API layer with a typed client, DTO-to-domain mapping and unified error handling.',
+      'Components must not know about fetch, URLs or the server response shape. Between them sits an API layer with a typed client, DTO-to-domain mapping and unified error handling.', 'Komponenty nie powinny znać fetch, URL-i i kształtu odpowiedzi serwera. Między nimi jest warstwa API z typowanym klientem, mapowaniem DTO na modele domenowe i jednolitą obsługą błędów.',
     ),
+    ...TEXTBOOK.api,
     rows: [
       {
-        label: t('Транспорт', 'Transport'),
+        label: t('Транспорт', 'Transport', 'Transport'),
         body: t(
           'Один HTTP-клиент: базовый URL, авторизация, refresh, ретраи, таймауты, AbortController, корреляционный ID.',
           'One HTTP client: base URL, auth, refresh, retries, timeouts, AbortController, correlation id.',
         ),
       },
       {
-        label: t('API-модули', 'API modules'),
+        label: t('API-модули', 'API modules', 'Moduły API'),
         body: t(
           'Модули по доменам (ordersApi.getList); типы из OpenAPI/GraphQL; Zod и маппинг DTO → модель фронта.',
           'Domain modules (ordersApi.getList); types from OpenAPI/GraphQL; Zod and DTO → frontend model mapping.',
         ),
       },
       {
-        label: t('Хуки данных', 'Data hooks'),
+        label: t('Хуки данных', 'Data hooks', 'Hooki danych'),
         body: t(
           'useOrders(filters) на TanStack Query: кэш, статусы, инвалидация. Компоненты используют только этот уровень.',
           'useOrders(filters) on TanStack Query: cache, statuses, invalidation. Components use only this level.',
@@ -453,11 +458,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   scale: {
     id: 'scale',
-    title: t('Масштабирование: монорепо, микрофронтенды, дизайн-система', 'Scale: monorepo, micro-frontends, design system'),
+    title: t('Масштабирование: монорепо, микрофронтенды, дизайн-система', 'Scale: monorepo, micro-frontends, design system', 'Skala: monorepo, mikrofrontendy, design system'),
     thesis: t(
       'Микрофронтенды решают организационную проблему (независимые команды и релизы), а не техническую. Если команд меньше 3–4 и они не мешают друг другу, модульный монолит в монорепо почти всегда дешевле.',
-      'Micro-frontends solve an organisational problem (independent teams and releases), not a technical one. If you have fewer than 3–4 teams and they do not block each other, a modular monolith in a monorepo is almost always cheaper.',
+      'Micro-frontends solve an organisational problem (independent teams and releases), not a technical one. If you have fewer than 3–4 teams and they do not block each other, a modular monolith in a monorepo is almost always cheaper.', 'Mikrofrontendy rozwiązują problem organizacyjny (niezależne zespoły i releasy), nie techniczny. Jeśli zespołów jest mniej niż 3–4 i nie blokują się nawzajem, modularny monolit w monorepo jest prawie zawsze tańszy.',
     ),
+    ...TEXTBOOK.scale,
     rows: [
       {
         label: t('Build-time (npm)', 'Build-time (npm)'),
@@ -542,7 +548,7 @@ export const TOPICS: Record<TopicId, Topic> = {
         node(
           'ds',
           'ui',
-          t('Design system', 'Design system'),
+          t('Design system', 'Design system', 'Design system'),
           t('Токены, примитивы, Storybook — общая поверхность даже при MFE.', 'Tokens, primitives, Storybook — a shared surface even with MFE.'),
           t('Копипаст примитивов, пока потребителей мало.', 'Copied primitives while there are few consumers.'),
           t('Кто принимает новый компонент в систему?', 'Who accepts a new component into the system?'),
@@ -558,11 +564,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   perf: {
     id: 'perf',
-    title: t('Производительность', 'Performance'),
+    title: t('Производительность', 'Performance', 'Wydajność'),
     thesis: t(
       'Ответ senior-уровня начинается с измерения, а не с useMemo: сначала метрики реальных пользователей (RUM), затем профилирование, затем точечные исправления и бюджет в CI, чтобы не откатиться.',
-      'A senior answer starts with measurement, not useMemo: real-user metrics (RUM) first, then profiling, then targeted fixes and a CI budget so it does not regress.',
+      'A senior answer starts with measurement, not useMemo: real-user metrics (RUM) first, then profiling, then targeted fixes and a CI budget so it does not regress.', 'Odpowiedź na poziomie seniora zaczyna się od pomiaru, nie od useMemo: najpierw metryki prawdziwych użytkowników (RUM), potem profilowanie, potem punktowe poprawki i budżet w CI, żeby się nie cofnęło.',
     ),
+    ...TEXTBOOK.perf,
     rows: [
       {
         label: t('LCP ≤ 2,5 с', 'LCP ≤ 2.5 s'),
@@ -657,11 +664,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   reliability: {
     id: 'reliability',
-    title: t('Надёжность: тесты, ошибки, наблюдаемость, релизы', 'Reliability: tests, errors, observability, releases'),
+    title: t('Надёжность: тесты, ошибки, наблюдаемость, релизы', 'Reliability: tests, errors, observability, releases', 'Niezawodność: testy, błędy, obserwowalność, releasy'),
     thesis: t(
       'Надёжный фронтенд — это не 100% покрытия, а быстрое обнаружение проблем и дешёвый откат: осмысленные тесты, мониторинг ошибок и метрик, релизы за feature flags.',
-      'A reliable frontend is not 100% coverage; it is fast detection and a cheap rollback: meaningful tests, error and metric monitoring, releases behind feature flags.',
+      'A reliable frontend is not 100% coverage; it is fast detection and a cheap rollback: meaningful tests, error and metric monitoring, releases behind feature flags.', 'Niezawodny frontend to nie 100% pokrycia, tylko szybkie wykrycie problemów i tani rollback: sensowne testy, monitoring błędów i metryk, releasy za feature flags.',
     ),
+    ...TEXTBOOK.reliability,
     rows: [
       {
         label: t('Testing trophy', 'Testing trophy'),
@@ -678,21 +686,21 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       },
       {
-        label: t('Ошибки в UI', 'UI errors'),
+        label: t('Ошибки в UI', 'UI errors', 'Błędy w UI'),
         body: t(
           'Error boundaries на приложении, маршруте и виджете с fallback и «повторить»; onerror/unhandledrejection; Query throwOnError выборочно; Sentry с source maps и релизом.',
           'Error boundaries at app, route and widget with fallback and retry; onerror/unhandledrejection; Query throwOnError selectively; Sentry with source maps and release.',
         ),
       },
       {
-        label: t('Прод-сигналы', 'Prod signals'),
+        label: t('Прод-сигналы', 'Prod signals', 'Sygnały z produkcji'),
         body: t(
           'Sentry-алерты на всплеск; RUM и CWV по релизам; воронка как ранний сигнал бага; синтетика критичных сценариев; дашборды по версиям.',
           'Sentry alerts on a spike; RUM and CWV by release; funnel as an early bug signal; synthetics on critical flows; dashboards by version.',
         ),
       },
       {
-        label: t('Выкат', 'Rollout'),
+        label: t('Выкат', 'Rollout', 'Wdrożenie'),
         body: t(
           'Feature flags: деплой ≠ релиз, процент, мгновенное выключение. Preview на PR, canary, immutable CDN и переключение версии. У флага — владелец и срок жизни.',
           'Feature flags: deploy ≠ release, percentage, instant off. Preview per PR, canary, immutable CDN and version switch. Each flag has an owner and a lifetime.',
@@ -753,11 +761,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   security: {
     id: 'security',
-    title: t('Безопасность фронтенда', 'Frontend security'),
+    title: t('Безопасность фронтенда', 'Frontend security', 'Bezpieczeństwo frontendu'),
     thesis: t(
       'Фронтенду нельзя доверять — любая проверка на клиенте нужна для UX, а безопасность обеспечивает сервер. Задача фронта — не открыть дыр: XSS, утечки токенов, уязвимые зависимости.',
-      'Never trust the frontend — any client check is for UX; the server enforces security. The frontend job is not to open holes: XSS, token leaks, vulnerable dependencies.',
+      'Never trust the frontend — any client check is for UX; the server enforces security. The frontend job is not to open holes: XSS, token leaks, vulnerable dependencies.', 'Frontendowi nie można ufać — każda kontrola na kliencie jest dla UX, bezpieczeństwo egzekwuje serwer. Zadanie frontu to nie otworzyć dziur: XSS, wycieki tokenów, podatne zależności.',
     ),
+    ...TEXTBOOK.security,
     rows: [
       {
         label: t('XSS', 'XSS'),
@@ -774,7 +783,7 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       },
       {
-        label: t('Кража токенов', 'Token theft'),
+        label: t('Кража токенов', 'Token theft', 'Kradzież tokenów'),
         body: t(
           'Токен читается скриптом. httpOnly cookie, короткоживущий access + refresh-ротация, BFF. localStorage доступен любому скрипту: одна XSS = кража JWT.',
           'A script can read the token. httpOnly cookie, short-lived access plus refresh rotation, BFF. localStorage is visible to any script: one XSS equals a stolen JWT.',
@@ -795,7 +804,7 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       },
       {
-        label: t('Утечка секретов', 'Secret leaks'),
+        label: t('Утечка секретов', 'Secret leaks', 'Wyciek sekretów'),
         body: t(
           'API-ключи в бандле. Все NEXT_PUBLIC_ / VITE_ переменные считать публичными; секреты только на сервере.',
           'API keys in the bundle. Treat every NEXT_PUBLIC_ / VITE_ variable as public; secrets stay on the server.',
@@ -817,7 +826,7 @@ export const TOPICS: Record<TopicId, Topic> = {
         node(
           'browser',
           'browser',
-          t('Browser', 'Browser'),
+          t('Browser', 'Browser', 'Przeglądarka'),
           t('Клиент контролирует злоумышленник: проверки на клиенте — UX, не безопасность.', 'An attacker controls the client: client checks are UX, not security.'),
           t('Слепая вера в скрытые поля формы.', 'Blind trust in hidden form fields.'),
           t('Что останется безопасным, если XSS исполнит любой JS?', 'What stays safe if XSS can run arbitrary JS?'),
@@ -856,11 +865,12 @@ export const TOPICS: Record<TopicId, Topic> = {
   },
   leadership: {
     id: 'leadership',
-    title: t('Процесс и лидерство', 'Process and leadership'),
+    title: t('Процесс и лидерство', 'Process and leadership', 'Proces i przywództwo'),
     thesis: t(
       'От senior ждут не только хороших решений, но и умения провести их через команду: зафиксировать, согласовать, внедрить постепенно и не остановить при этом продукт.',
-      'A senior is expected not only to pick good solutions but to carry them through the team: write them down, align, roll them out gradually, and keep the product shipping.',
+      'A senior is expected not only to pick good solutions but to carry them through the team: write them down, align, roll them out gradually, and keep the product shipping.', 'Od seniora oczekuje się nie tylko dobrych decyzji, ale też przeprowadzenia ich przez zespół: zapisać, uzgodnić, wdrożyć stopniowo i nie zatrzymać przy tym produktu.',
     ),
+    ...TEXTBOOK.leadership,
     rows: [
       {
         label: t('ADR / RFC', 'ADR / RFC'),
@@ -870,28 +880,28 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       },
       {
-        label: t('Техдолг', 'Tech debt'),
+        label: t('Техдолг', 'Tech debt', 'Dług techniczny'),
         body: t(
           'Сначала видимость: реестр с влиянием на фичи и баги. Приоритет impact/cost, доля 15–20% спринта или бойскаут рядом с фичей. Бизнесу — на его языке: «корзина дороже на 2–3 дня».',
           'Visibility first: a register of impact on features and bugs. Prioritise impact/cost, a steady 15–20% of the sprint or boy-scout work next to a feature. Explain in business terms: “checkout costs two or three extra days”.',
         ),
       },
       {
-        label: t('Миграция', 'Migration'),
+        label: t('Миграция', 'Migration', 'Migracja'),
         body: t(
           'Обоснование и метрики успеха; strangler fig без большого переписывания; codemods и линтер на старый паттерн; счётчик в CI; флаги и rollout; срок и владелец, иначе «80%» живёт годами.',
           'Rationale and success metrics; strangler fig, no big-bang rewrite; codemods and a lint ban on the old pattern; a CI counter; flags and rollout; a deadline and an owner, or the “80% done” migration lives for years.',
         ),
       },
       {
-        label: t('Качество в команде', 'Team quality'),
+        label: t('Качество в команде', 'Team quality', 'Jakość w zespole'),
         body: t(
           'Автоматизация вместо договорённостей: линтеры, форматтер, границы, типы в CI; гайдлайны и генераторы фич; ревью про дизайн, не про стиль; CODEOWNERS; онбординг и парное.',
           'Automation instead of honour agreements: linters, formatter, boundaries, types in CI; guidelines and feature generators; review for design, not style; CODEOWNERS; onboarding and pairing.',
         ),
       },
       {
-        label: t('Ошибочное решение', 'A wrong decision'),
+        label: t('Ошибочное решение', 'A wrong decision', 'Błędna decyzja'),
         body: t(
           'STAR: неверная предпосылка, как заметили, как исправили, какой вывод. Не перекладывать вину. We adopted X because Y; six months in, Z; proposed W; lesson — pilot before committing the codebase.',
           'STAR: the wrong assumption, how you noticed, how you fixed it, the lesson. Do not blame others. We adopted X because Y; six months in, Z; proposed W; lesson — pilot before committing the codebase.',

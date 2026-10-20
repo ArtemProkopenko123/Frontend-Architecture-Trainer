@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { isSessionComplete } from '../content/questions'
 import type {
   AppMode,
   Locale,
@@ -10,6 +11,7 @@ import type {
   SessionStep,
   TopicId,
 } from '../content/types'
+import { decodeContext, encodeContext } from '../engine/contextUrl'
 const STEPS: SessionStep[] = [
   'start',
   'context',
@@ -29,12 +31,12 @@ const RADIO_STEPS: RadioStep[] = [
   'optimizations',
 ]
 
-const MODES = new Set<AppMode>(['pipeline', 'radio', 'topics', 'prep'])
+const MODES = new Set<AppMode>(['pipeline', 'radio', 'topics', 'prep', 'guide'])
 const PREP_SECTIONS = new Set<PrepSection>(['story', 'traps', 'flags', 'ask', 'checklist'])
 const PREP_STORAGE = 'fe-arch-trainer-prep'
 const STEP_SET = new Set<SessionStep>(STEPS)
 const RADIO_STEP_SET = new Set<RadioStep>(RADIO_STEPS)
-const CASE_SET = new Set<RadioCaseId>(['feed', 'autocomplete', 'chat', 'dashboard'])
+const CASE_SET = new Set<RadioCaseId>(['feed', 'autocomplete', 'chat', 'dashboard', 'shop', 'kanban'])
 const TOPIC_SET = new Set<TopicId>([
   'structure',
   'state',
@@ -83,7 +85,8 @@ function topicFromUrl(): TopicId {
 
 function localeFromStorage(): Locale {
   const raw = window.localStorage.getItem('locale')
-  return raw === 'en' ? 'en' : 'ru'
+  if (raw === 'en' || raw === 'pl' || raw === 'ru') return raw
+  return 'ru'
 }
 
 function prepSectionFromUrl(): PrepSection {
@@ -92,28 +95,53 @@ function prepSectionFromUrl(): PrepSection {
   return 'story'
 }
 
-function loadPrep(): { checklist: Record<string, boolean>; story: Record<string, string> } {
+function asStringRecord(value: unknown): Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const out: Record<string, string> = {}
+  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof item === 'string') out[key] = item
+  }
+  return out
+}
+
+function asBoolRecord(value: unknown): Record<string, boolean> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  const out: Record<string, boolean> = {}
+  for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof item === 'boolean') out[key] = item
+  }
+  return out
+}
+
+function loadPrep(): {
+  checklist: Record<string, boolean>
+  story: Record<string, string>
+  rubric: Record<string, boolean>
+} {
   try {
     const raw = window.localStorage.getItem(PREP_STORAGE)
-    if (!raw) return { checklist: {}, story: {} }
-    const parsed = JSON.parse(raw) as { checklist?: unknown; story?: unknown }
+    if (!raw) return { checklist: {}, story: {}, rubric: {} }
+    const parsed = JSON.parse(raw) as { checklist?: unknown; story?: unknown; rubric?: unknown }
     return {
-      checklist:
-        parsed.checklist && typeof parsed.checklist === 'object' && !Array.isArray(parsed.checklist)
-          ? (parsed.checklist as Record<string, boolean>)
-          : {},
-      story:
-        parsed.story && typeof parsed.story === 'object' && !Array.isArray(parsed.story)
-          ? (parsed.story as Record<string, string>)
-          : {},
+      checklist: asBoolRecord(parsed.checklist),
+      story: asStringRecord(parsed.story),
+      rubric: asBoolRecord(parsed.rubric),
     }
   } catch {
-    return { checklist: {}, story: {} }
+    return { checklist: {}, story: {}, rubric: {} }
   }
 }
 
-function savePrep(checklist: Record<string, boolean>, story: Record<string, string>) {
-  window.localStorage.setItem(PREP_STORAGE, JSON.stringify({ checklist, story }))
+function savePrep(
+  checklist: Record<string, boolean>,
+  story: Record<string, string>,
+  rubric: Record<string, boolean>,
+) {
+  window.localStorage.setItem(PREP_STORAGE, JSON.stringify({ v: 2, checklist, story, rubric }))
+}
+
+function contextFromUrl(): { context: Partial<SessionContext>; profileId: ProfileId | null } {
+  return decodeContext(window.location.search.replace(/^\?/, ''))
 }
 
 export type SessionState = {
@@ -127,6 +155,7 @@ export type SessionState = {
   selectedTrickId: string
   checklist: Record<string, boolean>
   story: Record<string, string>
+  rubric: Record<string, boolean>
   context: Partial<SessionContext>
   selectedProfileId: ProfileId | null
   showAltScript: boolean
@@ -142,6 +171,7 @@ export type SessionState = {
   setPrepSection: (section: PrepSection) => void
   setSelectedTrickId: (id: string) => void
   toggleChecklist: (id: string) => void
+  toggleRubric: (id: string) => void
   setStoryField: (id: string, value: string) => void
   goNext: () => void
   goBack: () => void
@@ -158,6 +188,19 @@ export type SessionState = {
   isContextComplete: () => boolean
 }
 
+function writeContextParams(
+  params: URLSearchParams,
+  context: Partial<SessionContext> | undefined,
+  profileId: ProfileId | null | undefined,
+) {
+  for (const key of [...params.keys()]) {
+    if (key.startsWith('c.')) params.delete(key)
+  }
+  if (!context || !isSessionComplete(context)) return
+  const encoded = new URLSearchParams(encodeContext(context, profileId ?? null))
+  encoded.forEach((value, key) => params.set(key, value))
+}
+
 function syncUrl(state: {
   mode: AppMode
   step: SessionStep
@@ -165,6 +208,9 @@ function syncUrl(state: {
   radioCaseId: RadioCaseId | null
   topicId: TopicId
   prepSection: PrepSection
+  selectedTrickId?: string
+  context?: Partial<SessionContext>
+  selectedProfileId?: ProfileId | null
 }) {
   const url = new URL(window.location.href)
   const params = url.searchParams
@@ -188,15 +234,27 @@ function syncUrl(state: {
     params.delete('radioStep')
     params.delete('case')
     params.delete('prep')
-  } else {
+  } else if (state.mode === 'prep') {
     params.set('prep', state.prepSection)
+    if (state.selectedTrickId) params.set('trick', state.selectedTrickId)
     params.delete('step')
     params.delete('radioStep')
     params.delete('case')
     params.delete('topic')
+  } else {
+    params.delete('step')
+    params.delete('radioStep')
+    params.delete('case')
+    params.delete('topic')
+    params.delete('prep')
+    params.delete('trick')
   }
+  writeContextParams(params, state.context, state.selectedProfileId)
   window.history.replaceState({}, '', url)
 }
+
+const persistedPrep = loadPrep()
+const bootContext = contextFromUrl()
 
 export const useSessionStore = create<SessionState>((set, get) => ({
   locale: localeFromStorage(),
@@ -206,11 +264,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   radioCaseId: radioCaseFromUrl(),
   topicId: topicFromUrl(),
   prepSection: prepSectionFromUrl(),
-  selectedTrickId: 'best-arch',
-  checklist: loadPrep().checklist,
-  story: loadPrep().story,
-  context: {},
-  selectedProfileId: null,
+  selectedTrickId: readSearch().get('trick') || 'best-arch',
+  checklist: persistedPrep.checklist,
+  story: persistedPrep.story,
+  rubric: persistedPrep.rubric,
+  context: bootContext.context,
+  selectedProfileId: bootContext.profileId,
   showAltScript: false,
   timerElapsedMs: 0,
   timerRunning: false,
@@ -267,15 +326,23 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     syncUrl({ ...get(), prepSection })
     set({ prepSection })
   },
-  setSelectedTrickId: (selectedTrickId) => set({ selectedTrickId }),
+  setSelectedTrickId: (selectedTrickId) => {
+    syncUrl({ ...get(), selectedTrickId })
+    set({ selectedTrickId })
+  },
   toggleChecklist: (id) => {
     const checklist = { ...get().checklist, [id]: !get().checklist[id] }
-    savePrep(checklist, get().story)
+    savePrep(checklist, get().story, get().rubric)
     set({ checklist })
+  },
+  toggleRubric: (id) => {
+    const rubric = { ...get().rubric, [id]: !get().rubric[id] }
+    savePrep(get().checklist, get().story, rubric)
+    set({ rubric })
   },
   setStoryField: (id, value) => {
     const story = { ...get().story, [id]: value }
-    savePrep(get().checklist, story)
+    savePrep(get().checklist, story, get().rubric)
     set({ story })
   },
   goNext: () => {
@@ -309,12 +376,15 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ step: prev, showAltScript: false })
   },
   setContextField: (key, value) => {
-    set((state) => ({
-      context: { ...state.context, [key]: value },
-      selectedProfileId: null,
-    }))
+    const context = { ...get().context, [key]: value }
+    const selectedProfileId = null
+    syncUrl({ ...get(), context, selectedProfileId })
+    set({ context, selectedProfileId })
   },
-  setSelectedProfileId: (id) => set({ selectedProfileId: id }),
+  setSelectedProfileId: (id) => {
+    syncUrl({ ...get(), selectedProfileId: id })
+    set({ selectedProfileId: id })
+  },
   toggleAltScript: () => set((state) => ({ showAltScript: !state.showAltScript })),
   startTimer: () => {
     const state = get()
@@ -353,17 +423,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       showAltScript: false,
     })
   },
-  isContextComplete: () => {
-    const { context } = get()
-    return Boolean(
-      context.teamSize &&
-        context.teamsCount &&
-        context.product &&
-        context.seo &&
-        context.dataFreshness &&
-        context.independentReleases,
-    )
-  },
+  isContextComplete: () => isSessionComplete(get().context),
 }))
 
 export const STEP_ORDER = STEPS

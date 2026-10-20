@@ -11,6 +11,12 @@ const base = (overrides: Partial<SessionContext> = {}): SessionContext => ({
   seo: 'none',
   dataFreshness: 'static',
   independentReleases: 'no',
+  liveUpdates: 'none',
+  offline: 'none',
+  a11y: 'standard',
+  i18n: 'single',
+  network: 'good',
+  deadline: 'balanced',
   ...overrides,
 })
 
@@ -89,6 +95,47 @@ describe('recommend', () => {
     expect(result.recommendedId).toBe('csr_spa')
   })
 
+  it('recommends ssr_app when SEO is critical and live updates are needed even if data is static', () => {
+    const result = recommend(
+      base({
+        product: 'public_content',
+        seo: 'critical',
+        dataFreshness: 'static',
+        liveUpdates: 'needed',
+      }),
+    )
+    expect(result.recommendedId).toBe('ssr_app')
+  })
+
+  it('does not offer mfe under deadline pressure even with 4+ teams', () => {
+    const result = recommend(
+      base({
+        teamSize: '11+',
+        teamsCount: '4+',
+        independentReleases: 'yes',
+        deadline: 'speed',
+      }),
+    )
+    expect(result.optionIds).not.toContain('mfe')
+  })
+
+  it('adds notes for offline, a11y, i18n and slow networks', () => {
+    const result = recommend(
+      base({
+        offline: 'needed',
+        a11y: 'strict',
+        i18n: 'multi',
+        network: 'mobile_slow',
+        teamsCount: '2-3',
+      }),
+    )
+    const blob = result.notes.map((item) => `${item.ru} ${item.en}`).join(' ')
+    expect(blob).toMatch(/IndexedDB/)
+    expect(blob.toLowerCase()).toMatch(/a11y|доступн/)
+    expect(blob.toLowerCase()).toMatch(/locale|локал/)
+    expect(blob.toLowerCase()).toMatch(/ttfb/)
+  })
+
   it('always includes a csr vs ssr contrast', () => {
     const csr = recommend(base({ product: 'admin', seo: 'none' }))
     expect(csr.optionIds).toContain('ssr_app')
@@ -99,18 +146,33 @@ describe('recommend', () => {
 })
 
 describe('content catalogue', () => {
-  it('covers all six session context keys bilingually', () => {
+  it('covers all session context keys bilingually', () => {
     const keys = CONTEXT_QUESTIONS.map((q) => q.key)
     expect(keys.sort()).toEqual(
-      ['dataFreshness', 'independentReleases', 'product', 'seo', 'teamSize', 'teamsCount'].sort(),
+      [
+        'a11y',
+        'dataFreshness',
+        'deadline',
+        'i18n',
+        'independentReleases',
+        'liveUpdates',
+        'network',
+        'offline',
+        'product',
+        'seo',
+        'teamSize',
+        'teamsCount',
+      ].sort(),
     )
     for (const question of CONTEXT_QUESTIONS) {
       expect(question.prompt.ru.length).toBeGreaterThan(0)
       expect(question.prompt.en.length).toBeGreaterThan(0)
+      expect(question.prompt.pl.length).toBeGreaterThan(0)
       expect(question.options.length).toBeGreaterThan(1)
       for (const option of question.options) {
         expect(option.label.ru.length).toBeGreaterThan(0)
         expect(option.label.en.length).toBeGreaterThan(0)
+        expect(option.label.pl.length).toBeGreaterThan(0)
       }
     }
   })
@@ -122,7 +184,7 @@ describe('content catalogue', () => {
       expect(profile).toBe(PROFILES[id])
       expect(profile.id).toBe(id)
       expect(profile.diagram.nodes.some((node) => node.kind === 'query')).toBe(true)
-      const stateBlob = `${profile.state.ru} ${profile.state.en}`.toLowerCase()
+      const stateBlob = `${profile.state.ru} ${profile.state.en} ${profile.state.pl}`.toLowerCase()
       expect(stateBlob).toMatch(/tanstack query/)
       expect(stateBlob).not.toMatch(/все серверные данные живут в redux/)
       expect(stateBlob).not.toMatch(/server data lives in redux/)

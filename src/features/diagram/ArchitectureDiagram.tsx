@@ -3,6 +3,7 @@ import { getProfile } from '../../content/profiles'
 import { getRadioCase } from '../../content/radio'
 import { getTopic } from '../../content/topics'
 import type { SessionContext } from '../../content/types'
+import { adaptDiagram } from '../../engine/adaptDiagram'
 import { recommend } from '../../engine/recommend'
 import { t, ui } from '../../i18n/ui'
 import { useSessionStore } from '../../store/sessionStore'
@@ -47,17 +48,20 @@ export function ArchitectureDiagram() {
   }
 
   const showGraph = contextComplete && step !== 'start'
-  const profile = showGraph
-    ? getProfile(
-        selectedProfileId ?? recommend(context as SessionContext).recommendedId,
-      )
+  const session = showGraph ? (context as SessionContext) : null
+  const profile = session
+    ? getProfile(selectedProfileId ?? recommend(session).recommendedId)
     : null
+  const diagram =
+    profile && session
+      ? adaptDiagram(profile.diagram, session)
+      : null
 
   return (
     <SystemDiagram
       locale={locale}
-      diagram={profile?.diagram ?? null}
-      canvasKey={`pipe-${profile?.id ?? 'none'}-${locale}`}
+      diagram={diagram}
+      canvasKey={`pipe-${profile?.id ?? 'none'}-${session?.liveUpdates}-${session?.offline}-${locale}`}
       empty={t(ui.diagramEmpty, locale)}
     />
   )

@@ -1,6 +1,6 @@
 import type { DiagramEdgeSpec, DiagramNodeKind, DiagramNodeSpec, Localized } from './types'
 
-export const t = (ru: string, en: string): Localized => ({ ru, en })
+export const t = (ru: string, en: string, pl: string = en): Localized => ({ ru, en, pl })
 
 export function node(
   id: string,

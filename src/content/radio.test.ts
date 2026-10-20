@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { RADIO_CASES, getRadioCase } from './radio'
 import type { RadioCaseId } from './types'
 
-const CASE_IDS: RadioCaseId[] = ['feed', 'autocomplete', 'chat', 'dashboard']
+const CASE_IDS: RadioCaseId[] = ['feed', 'autocomplete', 'chat', 'dashboard', 'shop', 'kanban']
 
 describe('RADIO_CASES', () => {
-  it('defines the four radio cases', () => {
+  it('defines the radio cases including shop and kanban', () => {
     expect(Object.keys(RADIO_CASES).sort()).toEqual([...CASE_IDS].sort())
+    expect(getRadioCase('shop').diagram.nodes.some((node) => node.kind === 'query')).toBe(true)
+    expect(getRadioCase('kanban').diagram.nodes.some((node) => node.kind === 'query')).toBe(true)
   })
 
   it('gives each case a diagram with nodes and edges', () => {

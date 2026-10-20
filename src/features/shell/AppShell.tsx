@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import type { AppMode } from '../../content/types'
 import { t, ui } from '../../i18n/ui'
+import { SearchBox } from '../search/SearchBox'
 import {
   PREP_SECTION_ORDER,
   RADIO_STEP_ORDER,
@@ -7,18 +9,20 @@ import {
   useSessionStore,
 } from '../../store/sessionStore'
 import { ArchitectureDiagram } from '../diagram/ArchitectureDiagram'
+import { GuideAside, GuidePanel } from '../guide/GuidePanel'
 import { PrepAside, PrepPanel } from '../prep/PrepPanel'
 import { RoundTimer } from '../radio/RoundTimer'
 import { RadioWizard } from '../radio/RadioWizard'
 import { TopicsPanel } from '../topics/TopicsPanel'
 import { Wizard } from '../wizard/Wizard'
 
-const MODES: AppMode[] = ['pipeline', 'radio', 'topics', 'prep']
+const MODES: AppMode[] = ['guide', 'pipeline', 'radio', 'topics', 'prep']
 
 function subtitle(mode: AppMode) {
   if (mode === 'radio') return ui.radioSubtitle
   if (mode === 'topics') return ui.topicsSubtitle
   if (mode === 'prep') return ui.prepSubtitle
+  if (mode === 'guide') return ui.guideSubtitle
   return ui.appSubtitle
 }
 
@@ -35,6 +39,17 @@ export function AppShell() {
   const prepSection = useSessionStore((s) => s.prepSection)
   const setPrepSection = useSessionStore((s) => s.setPrepSection)
   const contextComplete = useSessionStore((s) => s.isContextComplete())
+  const topicId = useSessionStore((s) => s.topicId)
+  const [diagramOpen, setDiagramOpen] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 900px)').matches,
+  )
+
+  useEffect(() => {
+    const heading = document.querySelector('.wizard-pane h2')
+    if (!(heading instanceof HTMLElement)) return
+    heading.tabIndex = -1
+    heading.focus()
+  }, [mode, step, radioStep, prepSection, topicId])
 
   return (
     <div className="app-shell">
@@ -56,7 +71,8 @@ export function AppShell() {
               </button>
             ))}
           </div>
-          <div className="locale-toggle" role="group" aria-label="Language">
+          <SearchBox />
+          <div className="locale-toggle" role="group" aria-label={t(ui.languageGroup, locale)}>
             <button
               type="button"
               className={locale === 'ru' ? 'active' : ''}
@@ -70,6 +86,13 @@ export function AppShell() {
               onClick={() => setLocale('en')}
             >
               {ui.langEn.en}
+            </button>
+            <button
+              type="button"
+              className={locale === 'pl' ? 'active' : ''}
+              onClick={() => setLocale('pl')}
+            >
+              {ui.langPl.pl}
             </button>
           </div>
         </div>
@@ -135,13 +158,25 @@ export function AppShell() {
       ) : null}
       <main className="workspace">
         <section className="wizard-pane">
+          {mode === 'guide' ? <GuidePanel /> : null}
           {mode === 'pipeline' ? <Wizard /> : null}
           {mode === 'radio' ? <RadioWizard /> : null}
           {mode === 'topics' ? <TopicsPanel /> : null}
           {mode === 'prep' ? <PrepPanel /> : null}
         </section>
         <section className="diagram-pane">
-          {mode === 'prep' ? <PrepAside /> : <ArchitectureDiagram />}
+          {mode === 'prep' || mode === 'guide' ? (
+            mode === 'prep' ? <PrepAside /> : <GuideAside />
+          ) : (
+            <details
+              className="diagram-fold"
+              open={diagramOpen}
+              onToggle={(event) => setDiagramOpen(event.currentTarget.open)}
+            >
+              <summary>{t(ui.diagramTitle, locale)}</summary>
+              <ArchitectureDiagram />
+            </details>
+          )}
         </section>
       </main>
     </div>

@@ -51,6 +51,15 @@ export function SystemDiagram({
 
   const selected = diagram?.nodes.find((node) => node.id === selectedId)
 
+  useEffect(() => {
+    if (!selectedId) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSelectedId(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selectedId])
+
   return (
     <section>
       <h2>{t(ui.diagramTitle, locale)}</h2>

@@ -1,8 +1,11 @@
-export type Locale = 'ru' | 'en'
+export type Locale = 'ru' | 'en' | 'pl'
+
+export const LOCALES: Locale[] = ['ru', 'en', 'pl']
 
 export type Localized = {
   ru: string
   en: string
+  pl: string
 }
 
 export type TeamSize = '1-3' | '4-10' | '11+'
@@ -11,6 +14,12 @@ export type ProductType = 'admin' | 'public_content' | 'marketplace' | 'b2b_app'
 export type SeoNeed = 'none' | 'critical'
 export type DataFreshness = 'static' | 'infrequent' | 'realtime'
 export type IndependentReleases = 'yes' | 'no'
+export type LiveUpdates = 'none' | 'needed'
+export type OfflineNeed = 'none' | 'needed'
+export type A11yLevel = 'standard' | 'strict'
+export type I18nNeed = 'single' | 'multi'
+export type NetworkProfile = 'good' | 'mobile_slow'
+export type DeadlinePressure = 'speed' | 'balanced' | 'longevity'
 
 export type SessionContext = {
   teamSize: TeamSize
@@ -19,11 +28,17 @@ export type SessionContext = {
   seo: SeoNeed
   dataFreshness: DataFreshness
   independentReleases: IndependentReleases
+  liveUpdates: LiveUpdates
+  offline: OfflineNeed
+  a11y: A11yLevel
+  i18n: I18nNeed
+  network: NetworkProfile
+  deadline: DeadlinePressure
 }
 
 export type ContextKey = keyof SessionContext
 
-export type AppMode = 'pipeline' | 'radio' | 'topics' | 'prep'
+export type AppMode = 'pipeline' | 'radio' | 'topics' | 'prep' | 'guide'
 
 export type PrepSection = 'story' | 'traps' | 'flags' | 'ask' | 'checklist'
 
@@ -44,7 +59,7 @@ export type RadioStep =
   | 'interface'
   | 'optimizations'
 
-export type RadioCaseId = 'feed' | 'autocomplete' | 'chat' | 'dashboard'
+export type RadioCaseId = 'feed' | 'autocomplete' | 'chat' | 'dashboard' | 'shop' | 'kanban'
 
 export type TopicId =
   | 'structure'
@@ -109,10 +124,14 @@ export type ArchitectureProfile = {
 export type RecommendResult = {
   recommendedId: ProfileId
   optionIds: ProfileId[]
+  notes: Localized[]
 }
+
+export type QuestionGroup = 'org' | 'product' | 'experience'
 
 export type ContextQuestion = {
   key: ContextKey
+  group: QuestionGroup
   prompt: Localized
   options: { value: SessionContext[ContextKey]; label: Localized }[]
 }
@@ -141,12 +160,24 @@ export type TopicRow = {
   body: Localized
 }
 
+export type AnswerCard = {
+  id: string
+  title: Localized
+  checks: Localized
+  structure: Localized[]
+  sample: Localized
+}
+
 export type Topic = {
   id: TopicId
   title: Localized
   thesis: Localized
+  checks: Localized
+  structure: Localized[]
+  sample: Localized
   rows: TopicRow[]
   followUps: Localized[]
+  cards: AnswerCard[]
   redFlag?: Localized
   diagram?: DiagramSpec
 }
