@@ -1,4 +1,4 @@
-import { CONTEXT_QUESTIONS } from '../content/questions'
+import { CONTEXT_QUESTIONS, isSessionComplete } from '../content/questions'
 import type { ProfileId, SessionContext } from '../content/types'
 
 const PROFILE_IDS = new Set<ProfileId>(['csr_spa', 'ssg_isr', 'ssr_app', 'mfe'])
@@ -10,10 +10,17 @@ const ALLOWED: Record<string, Set<string>> = Object.fromEntries(
   ]),
 )
 
-export function encodeContext(ctx: SessionContext, profileId?: ProfileId | null): string {
+export function encodeContext(
+  ctx: Partial<SessionContext>,
+  profileId?: ProfileId | null,
+): string {
   const params = new URLSearchParams()
-  for (const key of CONTEXT_KEYS) params.set(`c.${key}`, String(ctx[key]))
-  if (profileId) params.set('c.profile', profileId)
+  for (const key of CONTEXT_KEYS) {
+    const value = ctx[key]
+    if (value === undefined || !ALLOWED[key]?.has(String(value))) continue
+    params.set(`c.${key}`, String(value))
+  }
+  if (profileId && isSessionComplete(ctx)) params.set('c.profile', profileId)
   return params.toString()
 }
 
@@ -34,7 +41,9 @@ export function decodeContext(raw: string): {
       context[key] = value as never
     }
     const profile = params.get('c.profile')
-    if (profile && PROFILE_IDS.has(profile as ProfileId)) profileId = profile as ProfileId
+    if (profile && PROFILE_IDS.has(profile as ProfileId) && isSessionComplete(context)) {
+      profileId = profile as ProfileId
+    }
   } catch {
     return { context: {}, profileId: null }
   }

@@ -187,7 +187,7 @@ function writeContextParams(
   for (const key of [...params.keys()]) {
     if (key.startsWith('c.')) params.delete(key)
   }
-  if (!context || !isSessionComplete(context)) return
+  if (!context) return
   const encoded = new URLSearchParams(encodeContext(context, profileId ?? null))
   encoded.forEach((value, key) => params.set(key, value))
 }

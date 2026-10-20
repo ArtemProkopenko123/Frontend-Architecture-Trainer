@@ -28,6 +28,30 @@ describe('contextUrl', () => {
     expect(decoded.profileId).toBe('ssr_app')
   })
 
+  it('round-trips a partial context without writing missing fields', () => {
+    const raw = encodeContext({ product: 'marketplace', seo: 'critical', network: 'mobile_slow' })
+    const params = new URLSearchParams(raw)
+    expect([...params.keys()].sort()).toEqual(['c.network', 'c.product', 'c.seo'])
+    expect(decodeContext(raw)).toEqual({
+      context: { product: 'marketplace', seo: 'critical', network: 'mobile_slow' },
+      profileId: null,
+    })
+  })
+
+  it('skips undefined and invalid values when encoding and decoding partials', () => {
+    const raw = encodeContext({ product: 'admin', seo: undefined, teamSize: '1-3' })
+    expect(raw).not.toContain('undefined')
+    expect(raw).not.toContain('c.seo')
+    const decoded = decodeContext(`${raw}&c.network=nope&c.unknown=1&c.a11y=strict`)
+    expect(decoded.context).toEqual({ product: 'admin', teamSize: '1-3', a11y: 'strict' })
+  })
+
+  it('does not serialize or restore a profile for an incomplete context', () => {
+    const raw = encodeContext({ product: 'admin', seo: 'none' }, 'ssr_app')
+    expect(raw).not.toContain('c.profile')
+    expect(decodeContext('c.product=admin&c.seo=none&c.profile=ssr_app').profileId).toBeNull()
+  })
+
   it('never throws on garbage', () => {
     expect(decodeContext('%zz').context).toEqual({})
     expect(decodeContext('not-a-query').profileId).toBeNull()

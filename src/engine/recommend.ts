@@ -9,8 +9,9 @@ function pickRecommended(context: SessionContext): ProfileId {
   return 'csr_spa'
 }
 
-function contrastOf(id: ProfileId): ProfileId {
-  return id === 'csr_spa' ? 'ssr_app' : 'csr_spa'
+function contrastOf(id: ProfileId, context: SessionContext): ProfileId {
+  if (id === 'ssr_app' && context.seo === 'critical') return 'ssg_isr'
+  return 'ssr_app'
 }
 
 function shouldOfferMfe(context: SessionContext): boolean {
@@ -86,7 +87,7 @@ function notesFor(context: SessionContext, recommendedId: ProfileId): Localized[
 export function recommend(context: SessionContext): RecommendResult {
   const recommendedId = pickRecommended(context)
   const optionIds: ProfileId[] = [recommendedId]
-  const contrast = contrastOf(recommendedId)
+  const contrast = contrastOf(recommendedId, context)
   if (!optionIds.includes(contrast)) optionIds.push(contrast)
   if (shouldOfferMfe(context) && !optionIds.includes('mfe')) optionIds.push('mfe')
   return { recommendedId, optionIds, notes: notesFor(context, recommendedId) }

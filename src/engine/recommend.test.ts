@@ -136,12 +136,48 @@ describe('recommend', () => {
     expect(blob.toLowerCase()).toMatch(/ttfb/)
   })
 
-  it('always includes a csr vs ssr contrast', () => {
+  it('contrasts csr_spa with ssr_app', () => {
     const csr = recommend(base({ product: 'admin', seo: 'none' }))
-    expect(csr.optionIds).toContain('ssr_app')
+    expect(csr.recommendedId).toBe('csr_spa')
+    expect(csr.optionIds).toEqual(['csr_spa', 'ssr_app'])
+  })
 
-    const ssr = recommend(base({ product: 'marketplace', seo: 'critical', dataFreshness: 'realtime' }))
-    expect(ssr.optionIds).toContain('csr_spa')
+  it('contrasts ssg_isr with ssr_app for critical-SEO static content', () => {
+    const result = recommend(
+      base({ product: 'public_content', seo: 'critical', dataFreshness: 'static' }),
+    )
+    expect(result.recommendedId).toBe('ssg_isr')
+    expect(result.optionIds).toEqual(['ssg_isr', 'ssr_app'])
+  })
+
+  it('contrasts ssg_isr with ssr_app for slow-network public content without SEO', () => {
+    const result = recommend(
+      base({ product: 'public_content', seo: 'none', network: 'mobile_slow' }),
+    )
+    expect(result.recommendedId).toBe('ssg_isr')
+    expect(result.optionIds).toEqual(['ssg_isr', 'ssr_app'])
+  })
+
+  it('contrasts ssr_app with ssg_isr for critical-SEO realtime context', () => {
+    const result = recommend(
+      base({ product: 'marketplace', seo: 'critical', dataFreshness: 'realtime' }),
+    )
+    expect(result.recommendedId).toBe('ssr_app')
+    expect(result.optionIds).toEqual(['ssr_app', 'ssg_isr'])
+  })
+
+  it('keeps mfe last without duplicating ids in the isr/ssr contrast', () => {
+    const result = recommend(
+      base({
+        product: 'marketplace',
+        seo: 'critical',
+        dataFreshness: 'infrequent',
+        teamSize: '11+',
+        teamsCount: '4+',
+        independentReleases: 'yes',
+      }),
+    )
+    expect(result.optionIds).toEqual(['ssg_isr', 'ssr_app', 'mfe'])
   })
 })
 
