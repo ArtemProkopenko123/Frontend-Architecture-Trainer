@@ -62,6 +62,7 @@ export type RadioStep =
 export type RadioCaseId = 'feed' | 'autocomplete' | 'chat' | 'dashboard' | 'shop' | 'kanban'
 
 export type TopicId =
+  | 'architecture'
   | 'structure'
   | 'state'
   | 'rendering'
@@ -70,6 +71,9 @@ export type TopicId =
   | 'perf'
   | 'reliability'
   | 'security'
+  | 'a11y'
+  | 'offline'
+  | 'i18n'
   | 'leadership'
 
 export type ProfileId = 'csr_spa' | 'ssg_isr' | 'ssr_app' | 'mfe'

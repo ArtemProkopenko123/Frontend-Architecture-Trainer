@@ -363,6 +363,111 @@ Senior отличается от middle не знанием паттернов, 
 
 **Уточнение «Что такое CORS?»** — Механизм браузера, который разрешает или запрещает чтение ответа с другого origin; это не защита сервера — запрос из curl CORS не ограничивает.
 
+## Доступность (a11y)
+
+Доступность — требование к продукту, а не финальная полировка: семантический HTML закрывает большую часть задач, ARIA нужна только там, где семантики не хватает, а проверки автоматизированы в CI и дополнены ручным прогоном.
+
+### «Как ты обеспечиваешь доступность в приложении?»
+
+**Что проверяют:** относишься ли ты к a11y как к архитектурному требованию, а не к «навесить `aria-label` перед релизом».
+
+> RU: «Я начинаю с требования: целимся в WCAG 2.2 AA, потому что это и закон, и реальные пользователи. Порядок такой: сначала семантический HTML — `button`, `label`, заголовки, landmarks, — потом клавиатура и управление фокусом, и только где семантики не хватает — ARIA. Сложные виджеты берём из headless-примитивов дизайн-системы, поэтому клавиатурный контракт написан один раз; фича отвечает за подписи, заголовки и тексты ошибок. Проверяю `eslint-plugin-jsx-a11y` и axe в CI, критичные сценарии — в Playwright, плюс ручной прогон с клавиатурой и screen reader перед релизом. Цена: примитивы медленнее прототипировать, бренд-цвета упираются в контраст, автоматика ловит лишь часть проблем. Если ручные проверки регулярно находят регрессии, которые пропустил axe, или появляется аудит и юридическое требование, перехожу к выделенному a11y-ownership и регулярному аудиту.»
+>
+> EN: “I start with the requirement: we target WCAG 2.2 AA because it is both the law and real users. The order is semantic HTML first — `button`, `label`, headings, landmarks — then keyboard and focus management, and ARIA only where semantics fall short. Complex widgets come from the design system's headless primitives, so the keyboard contract is written once; the feature owns labels, headings and error copy. I check with `eslint-plugin-jsx-a11y` and axe in CI, critical flows in Playwright, plus a manual keyboard and screen-reader pass before release. The cost: primitives are slower to prototype, brand colours collide with contrast, and automation catches only part of the issues. If manual checks keep finding regressions axe missed, or an audit or legal requirement appears, I move to dedicated a11y ownership and regular audits.”
+
+### Что именно делаем
+
+| Тема | Практика |
+| --- | --- |
+| WCAG | Принципы POUR (воспринимаемость, управляемость, понятность, надёжность); цель — уровень AA: контраст текста 4,5:1, всё доступно с клавиатуры, видимый фокус, подписи у полей |
+| Семантический HTML | `button` вместо `div` с `onClick`, `label` у каждого поля, иерархия заголовков, landmarks; нет нативного элемента — тогда ARIA и полный контракт (роль, состояние, клавиши) |
+| Клавиатура и фокус | Логичный порядок Tab, `:focus-visible`, ловушка фокуса в модалке с возвратом на триггер, roving tabindex, skip link, перенос фокуса при смене маршрута в SPA |
+| Screen readers и live regions | Доступное имя у каждого контрола; `role="status"` (polite) и `role="alert"` (assertive); регион в DOM заранее; `aria-busy` при загрузке |
+| Границы дизайн-системы | Примитивы (Radix, React Aria) владеют ролями, клавишами и фокусом; фича — подписями, заголовками, ошибками и порядком на странице |
+| Проверки | `eslint-plugin-jsx-a11y`, axe (unit, Storybook, Playwright), ручной прогон с VoiceOver/NVDA и zoom 200% |
+
+### Связанные вопросы
+
+**«Как сделать доступное модальное окно?»** — Фокус внутрь, ловушка Tab, Esc закрывает, фокус возвращается на триггер, фон inert или `aria-modal`. Нативный `<dialog>` закрывает большую часть.
+
+**«Что делать с фокусом при смене маршрута в SPA?»** — Переносить фокус на заголовок страницы, обновлять `document.title` и озвучивать переход через live region, иначе пользователь screen reader не узнает, что страница сменилась.
+
+**«Достаточно ли axe в CI?»** — Нет: автоматика находит лишь часть нарушений и не оценивает смысл подписей, порядок фокуса и озвучку динамики. Нужны ручной прогон и осмысленные критерии приёмки.
+
+**«При каком сигнале усиливать подход?»** — Если ручные проверки регулярно находят то, что пропустил axe, или появляется юридическое требование (European Accessibility Act) — нанять a11y-ownership, ввести аудит и тесты с реальными пользователями; пересматривать подход раз в квартал.
+
+**Красный флаг:** «навешу `aria-label` на всё» или «доступность проверит axe» — без семантики, клавиатуры и ручной проверки.
+
+## Офлайн и нестабильная сеть
+
+Офлайн — это два разных мира: **кэш чтения** (service worker, Cache API, stale-while-revalidate) и **офлайн-запись** (outbox в IndexedDB, идемпотентность, конфликты). Не смешивай их: кэш чтения дёшев и безопасен, офлайн-запись — распределённая система на клиенте.
+
+### «Как сделать приложение работающим офлайн?»
+
+**Что проверяют:** различаешь ли ты чтение и запись и понимаешь ли цену офлайн-записи.
+
+> RU: «Сначала уточняю, что значит офлайн: открыть приложение без сети, читать закэшированное или ещё и писать. Чтение — это service worker и кэш: cache-first для ассетов с хешами, stale-while-revalidate для списков, network-first там, где важна свежесть, и никакого кэша для платежей. Запись — другая задача: действие сначала сохраняется в outbox в IndexedDB с `clientId`, UI показывает pending, а при reconnect очередь проигрывается по порядку; сервер дедуплицирует по ключу идемпотентности, а конфликты решаются версией (ETag, `If-Match`) или явным UI слияния. Цена: хранилище и квоты, миграции схемы IndexedDB, обновления service worker и тестирование состояний сети. Я бы начал с кэша чтения и ретраев, добавил outbox для одного-двух критичных сценариев и перешёл к sync-движку или CRDT, только когда конфликты станут частыми.»
+>
+> EN: “First I clarify what offline means: opening the app without a network, reading cached data, or also writing. Reading is a service worker and a cache: cache-first for hashed assets, stale-while-revalidate for lists, network-first where freshness matters, and no cache for payments. Writing is a different problem: the action is first saved to an outbox in IndexedDB with a `clientId`, the UI shows pending, and on reconnect the queue replays in order; the server dedupes via an idempotency key, and conflicts are resolved with a version (ETag, `If-Match`) or an explicit merge UI. The cost: storage and quotas, IndexedDB schema migrations, service worker updates and testing network states. I would start with read caching and retries, add an outbox for one or two critical flows, and move to a sync engine or CRDT only once conflicts become frequent.”
+
+### Чтение и запись — разные решения
+
+| Тема | Практика |
+| --- | --- |
+| Стратегии кэша чтения | Ассеты с хешем — cache-first; HTML и данные, где важна свежесть, — network-first; списки, аватары — stale-while-revalidate; платежи — только сеть. App shell открывается без сети (Workbox упрощает стратегии) |
+| Хранилище | Cache API — для ответов; IndexedDB (idb, Dexie) — для структурированных данных и outbox; `localStorage` синхронный и мал. Квоты и вытеснение: `navigator.storage.persist()`, версионирование схемы |
+| Outbox | Действие `{clientId, тип, payload, время, попытки}` сохраняется до того, как UI скажет «сохранено»; проигрывание по порядку при `online`, на старте и по Background Sync (он не везде); одна вкладка — лидер (Web Locks) |
+| Optimistic UI | Результат сразу, статус pending → synced / failed, откат или «повторить»; «сохранено локально» ≠ «подтверждено сервером»; не для платежей |
+| Идемпотентность | Клиент генерирует `clientId` и шлёт как `Idempotency-Key`; доставка at-least-once, сервер дедуплицирует и возвращает прежний результат |
+| Конфликты и reconnect | LWW для простого; версия/ETag и `If-Match` с 409 для важного; слияние по полям или CRDT для редакторов. После reconnect: backoff с jitter, инвалидация кэша, догон событий, обновление токена |
+
+### Связанные вопросы
+
+**«Как обновлять service worker?»** — `skipWaiting` и `clients.claim` рискуют смешать старый HTML и новые ассеты; безопаснее показать «доступна новая версия», чистить старые кэши на `activate` и версионировать имена кэшей.
+
+**«Можно ли доверять `navigator.onLine`?»** — Нет: «подключён к Wi-Fi» не значит «есть интернет». Источник правды — результат запроса; очень медленную сеть (lie-fi) лечат таймауты и состояние «синхронизируется».
+
+**«Что с несколькими вкладками?»** — `BroadcastChannel` рассылает изменения, Web Locks выбирают одну вкладку для проигрывания outbox; иначе действие уйдёт дважды (идемпотентность — страховка, а не замена).
+
+**«Как тестировать?»** — Playwright `context.setOffline`, перехват сети, проверка проигрывания outbox после reconnect, повторной доставки и ответа 409.
+
+**Красный флаг:** «добавим service worker, и офлайн заработает» — без стратегии кэша, очереди записей, идемпотентности и конфликтов.
+
+## Интернационализация (i18n) и локализация
+
+i18n — архитектурное решение, а не словарь строк: локаль живёт в URL, форматы идут через `Intl` и ICU, словари грузятся лениво и доступны на сервере, вёрстка готова к RTL и длинным строкам. Библиотека вторична и не должна определять модель.
+
+### «Как ты спроектируешь мультиязычное приложение?»
+
+**Что проверяют:** видишь ли ты i18n как архитектуру (URL, SSR, форматы, вёрстка, процесс), а не как подключение библиотеки.
+
+> RU: «Начинаю с требований: сколько языков и регионов, нужен ли RTL, важно ли SEO. Локаль живёт в URL (`/pl/…`): так страницу можно шарить, кэшировать на CDN и отдавать поисковикам с `hreflang`; cookie и `Accept-Language` нужны только для первого редиректа. Форматирование — через `Intl` и сообщения в ICU MessageFormat, плюрализация по правилам языка, а не `if (count === 1)`; строки никогда не склеиваю. Словари грузятся лениво по локали и маршруту и доступны на сервере, чтобы SSR отдавал нужный язык без мерцания и hydration mismatch. Вёрстка использует logical properties и не рассчитывает на длину английского текста. Библиотеку (i18next, FormatJS, Lingui, next-intl) выбираю последней: по поддержке ICU, извлечению ключей, размеру и RSC. Цена: процесс переводов, размер бандла и тестовая матрица; поэтому добавляю языки по сигналу рынка и проверяю псевдолокализацией и missing-key проверкой в CI.»
+>
+> EN: “I start with requirements: how many languages and regions, is RTL needed, does SEO matter. The locale lives in the URL (`/pl/…`) because that makes pages shareable, CDN-cacheable and indexable with `hreflang`; the cookie and `Accept-Language` only drive the first redirect. Formatting goes through `Intl` and messages in ICU MessageFormat, with plurals by language rules rather than `if (count === 1)`; I never concatenate strings. Dictionaries load lazily per locale and route and are available on the server so SSR renders the right language without flicker or a hydration mismatch. Layout uses logical properties and does not assume English text length. I choose the library (i18next, FormatJS, Lingui, next-intl) last: by ICU support, key extraction, size and RSC support. The cost: translation workflow, bundle size and a test matrix, so I add languages on a market signal and verify with pseudo-localisation and a missing-key check in CI.”
+
+### Из чего состоит решение
+
+| Тема | Практика |
+| --- | --- |
+| Локаль в URL | Путь или поддомен: однозначная ссылка, CDN-кэш, `hreflang` и canonical; смена языка — переход по URL, а не `setState` |
+| `Intl` и форматы | Числа, валюта, даты, относительное время, списки, сортировка — `Intl.*`; валюта не выводится из языка, часовой пояс хранится отдельно от локали |
+| ICU и плюрализация | Сообщение целиком (`plural`, `select`, вставки); у русского и польского `one/few/many/other`, у английского `one/other`; `Intl.PluralRules`; никакой склейки |
+| Ленивые словари и SSR | Чанк на локаль и маршрут через dynamic import с хешем; SSR отдаёт HTML на нужном языке и встраивает только нужные сообщения; fallback-локаль |
+| RTL и вёрстка | `dir="rtl"`, logical properties (`margin-inline-start`), зеркалирование иконок, `<bdi>`; запас под удлинение текста (польский и немецкий длиннее английского) |
+| Тестирование | Линтер на hardcoded-строки, сверка ключей и валидация ICU в CI, псевдолокализация, Playwright-снапшоты в RTL и самой длинной локали, plural-кейсы 0, 1, 2, 5, 22 |
+
+### Связанные вопросы
+
+**«Какую библиотеку выбрать?»** — Не привязываться: i18next, FormatJS/react-intl, Lingui и next-intl решают одну задачу. Критерии: поддержка ICU, извлечение ключей, размер, RSC и SSR. Формат сообщений (ICU) и ключи держать переносимыми.
+
+**«Как устроен процесс переводов?»** — Ключи по смыслу, а не по тексту; извлечение из кода; TMS (Crowdin, Lokalise) с контекстом и скриншотами; ревью перед релизом; fallback на язык по умолчанию.
+
+**«Как работать с датами и временем?»** — Хранить UTC и IANA-пояс, форматировать на клиенте через `Intl.DateTimeFormat` с `timeZone`; «сегодня» и «через 2 дня» зависят от пояса пользователя, а не сервера.
+
+**«Когда добавлять языки и RTL?»** — Сначала i18n-ready код (без hardcoded, через `Intl`) для одной локали; второй язык добавляет URL и ленивые словари; RTL — по сигналу рынка. Пересматривать при росте очереди переводов, размера бандла или доли трафика из новых регионов.
+
+**Красный флаг:** хардкод строк, склейка фраз через `+` и убеждение, что i18n — это «подключить библиотеку и словарь».
+
 ## Frontend System Design
 
 На раунде system design ведёшь ты: уточняешь требования, рисуешь схему, проектируешь модель данных и API, затем углубляешься в оптимизации. Используй фреймворк RADIO и держи тайминг — интервьюер хочет увидеть структуру, а не идеальное решение.
