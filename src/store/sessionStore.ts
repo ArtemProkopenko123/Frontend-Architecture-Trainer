@@ -77,7 +77,7 @@ function topicFromUrl(): TopicId {
 function localeFromStorage(): Locale {
   const raw = window.localStorage.getItem('locale')
   if (raw === 'en' || raw === 'pl' || raw === 'ru') return raw
-  return 'ru'
+  return 'en'
 }
 
 function prepSectionFromUrl(): PrepSection {

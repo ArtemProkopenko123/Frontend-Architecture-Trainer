@@ -134,6 +134,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Which is your most frequent change, and does it stay cheap?',
             'Która zmiana jest u was najczęstsza i czy pozostaje tania?',
           ),
+          t(
+            'Самое частое изменение у нас — поле или фильтр в админке каталога, и оно должно оставаться дешёвым: правим один feature-модуль и его хук данных. Цена такого фокуса — жёсткие границы и отказ от «быстрого» импорта из соседней фичи.',
+            'Our most frequent change is a field or filter in the catalogue admin, and it has to stay cheap: we edit one feature module and its data hook. The cost of that focus is strict boundaries and refusing a “quick” import from a neighbour feature.',
+            'Najczęstsza zmiana u nas to pole albo filtr w adminie katalogu i ma pozostać tania: edytujemy jeden moduł funkcji i jego hook danych. Ceną tego skupienia są twarde granice i odmowa „szybkiego” importu z sąsiedniej funkcji.',
+          ),
         ),
         node(
           'boundaries',
@@ -153,6 +158,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Кто владеет каждой границей и как она совпадает с командами?',
             'Who owns each boundary, and how does it match the teams?',
             'Kto jest właścicielem każdej granicy i jak pokrywa się z zespołami?',
+          ),
+          t(
+            'Каждую границу модуля держит одна продуктовая команда через CODEOWNERS, а публичный API слайса совпадает с зоной ownership, чтобы чужой PR не тёрся о внутренности. Цена — согласование контракта при пересечении команд и чуть более медленный первый импорт.',
+            'Each module boundary is owned by one product team via CODEOWNERS, and the slice public API matches that ownership so a foreign PR cannot touch internals. The cost is negotiating the contract when teams cross and a slightly slower first import.',
+            'Każdą granicę modułu trzyma jeden zespół produktowy przez CODEOWNERS, a publiczne API slajsu pokrywa się z ownership, żeby cudzy PR nie grzebał we wnętrzu. Ceną jest uzgodnienie kontraktu przy przecięciu zespołów i trochę wolniejszy pierwszy import.',
           ),
         ),
         node(
@@ -174,6 +184,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'What exactly fails in CI when a boundary is broken?',
             'Co dokładnie wywala się w CI przy naruszeniu granicy?',
           ),
+          t(
+            'При нарушении границы падает eslint-plugin-boundaries и проверка циклов в CI: deep import или импорт «вверх» ломает пайплайн до ревью. Цена — ложные срабатывания при легитимном исключении, которое нужно явно занести в allowlist.',
+            'A broken boundary fails eslint-plugin-boundaries and the cycle check in CI: a deep import or an upward import breaks the pipeline before review. The cost is false positives on a legitimate exception, which must be added to an allowlist on purpose.',
+            'Przy naruszeniu granicy pada eslint-plugin-boundaries i kontrola cykli w CI: deep import albo import „w górę” łamie pipeline przed review. Ceną są fałszywe alarmy przy legalnym wyjątku, który trzeba świadomie wpisać na allowlistę.',
+          ),
         ),
         node(
           'signals',
@@ -193,6 +208,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'При каком сигнале вы пересмотрите решение?',
             'At what signal would you revisit the decision?',
             'Przy jakim sygnale zrewidujecie decyzję?',
+          ),
+          t(
+            'Решение пересматриваю, когда lead time типичного изменения вырос вдвое или LCP/error rate на ключевом экране хуже базовой линии два спринта подряд. Цена ожидания сигнала — какое-то время живём с субоптимальной схемой, зато не прыгаем по архитектуре без цифр.',
+            'I revisit the decision when typical-change lead time has doubled or LCP/error rate on a key screen is worse than baseline for two sprints. The cost of waiting for that signal is living with a suboptimal setup for a while, instead of hopping architectures without numbers.',
+            'Decyzję rewiduję, gdy lead time typowej zmiany się podwoił albo LCP/error rate na kluczowym ekranie jest gorszy od baseline przez dwa sprinty. Ceną czekania na sygnał jest jakiś czas z gorszym układem, za to nie skaczemy po architekturze bez liczb.',
           ),
         ),
       ],
@@ -277,6 +297,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Композиция фич сверху; фичи не импортируют друг друга напрямую.', 'Compose features from above; features do not import each other directly.'),
           t('Прямой импорт фичи в фичу — путь к циклам.', 'Feature-to-feature imports are how cycles start.'),
           t('Где проходит публичный API слайса?', 'Where does the slice public API sit?'),
+          t(
+            'Публичный API слайса сидит в index.ts фичи: страница импортирует только оттуда, а внутренние хуки и компоненты остаются закрытыми. Цена — каждый новый экспорт надо осознанно выпускать, иначе линтер поймает deep import.',
+            'The slice public API sits in the feature’s index.ts: the page imports only from there, and internal hooks and components stay private. The cost is that every new export must be published on purpose, or the linter flags a deep import.',
+            'Publiczne API slajsu siedzi w index.ts funkcji: strona importuje tylko stamtąd, a wewnętrzne hooki i komponenty zostają prywatne. Ceną jest to, że każdy nowy eksport trzeba świadomie wypuścić, inaczej linter złapie deep import.',
+          ),
         ),
         node(
           'feature',
@@ -285,6 +310,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Компоненты, хуки, API и тесты фичи лежат вместе.', 'The feature’s components, hooks, API and tests live together.'),
           t('Группировка by type, пока проект маленький.', 'By-type folders while the project is tiny.'),
           t('Что торчит из index.ts и что линтер считает deep import?', 'What does index.ts export, and what does the linter treat as a deep import?'),
+          t(
+            'Из index.ts торчат только публичные компоненты и хуки фичи, а путь вида feature/ui/Form — deep import, который eslint-plugin-boundaries валит в CI. Цена жёсткого индекса — чуть больше работы на реэкспорт, зато внутренности можно двигать без чужих PR.',
+            'index.ts exports only the feature’s public components and hooks; a path like feature/ui/Form is a deep import that eslint-plugin-boundaries fails in CI. The cost of a strict barrel is a bit more re-export work, but internals can move without foreign PRs.',
+            'Z index.ts wystają tylko publiczne komponenty i hooki funkcji, a ścieżka w stylu feature/ui/Form to deep import, który eslint-plugin-boundaries wywala w CI. Ceną twardej beczki jest trochę więcej re-eksportu, za to wnętrze można ruszać bez cudzych PR-ów.',
+          ),
         ),
         node(
           'shared',
@@ -293,6 +323,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Общее уходит вниз по слоям, не вверх.', 'Shared code moves down the layers, never up.'),
           t('Дублирование до второго-третьего потребителя (rule of three).', 'Duplication until the second or third consumer (rule of three).'),
           t('Это примитив UI или сущность с бизнесом?', 'Is this a UI primitive or an entity with business meaning?'),
+          t(
+            'Если у блока нет бизнес-смысла — кнопка, инпут, модалка — кладу в shared/ui; если это заказ или товар с правилами домена — в entities. Цена ошибки классификации — либо раздутый дизайн-системный слой, либо сущности, которые тащат UI-примитивы вверх.',
+            'If the block has no business meaning — button, input, modal — it goes to shared/ui; if it is an order or product with domain rules, it goes to entities. The cost of a wrong call is either a bloated design-system layer or entities that pull UI primitives upward.',
+            'Jeśli blok nie ma znaczenia biznesowego — przycisk, input, modal — idzie do shared/ui; jeśli to zamówienie albo produkt z regułami domeny — do entities. Ceną złej klasyfikacji jest albo rozdęta warstwa design systemu, albo encje, które ciągną prymitywy UI w górę.',
+          ),
         ),
         node(
           'boundaries',
@@ -301,6 +336,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Правило «импортировать только вниз» иначе разъедется за полгода.', 'The “import only downwards” rule erodes within six months without automation.'),
           t('Nx module boundaries в монорепо.', 'Nx module boundaries in a monorepo.'),
           t('Что именно падает в CI при цикле или deep import?', 'What fails in CI on a cycle or a deep import?'),
+          t(
+            'Цикл и deep import валят eslint-plugin-boundaries и madge/dependency-cruiser в CI, так что PR не сливается, пока импорт не уйдёт вниз через публичный API. Цена — иногда легитимный обход приходится явно разрешать, и это видно в ревью.',
+            'A cycle or deep import fails eslint-plugin-boundaries and madge/dependency-cruiser in CI, so the PR cannot merge until the import goes downwards through the public API. The cost is that a legitimate escape hatch must be allowed explicitly and shows up in review.',
+            'Cykl i deep import wywalają eslint-plugin-boundaries oraz madge/dependency-cruiser w CI, więc PR nie wejdzie, dopóki import nie pójdzie w dół przez publiczne API. Ceną jest to, że legalny wyjątek trzeba jawnie zezwolić i widać go na review.',
+          ),
         ),
       ],
       edges: [
@@ -396,6 +436,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Серверные данные — кэш: загрузка, дедупликация, рефетч, инвалидация.', 'Server data is a cache: loading, deduplication, refetch, invalidation.'),
           t('RTK Query или SWR решают ту же задачу.', 'RTK Query or SWR do the same job.'),
           t('Как инвалидируете связанные ключи после мутации?', 'How do you invalidate related keys after a mutation?'),
+          t(
+            'После мутации инвалидирую фабрикой ключей фичи: orderKeys.list(filters) и orderKeys.detail(id), а не строками наугад, чтобы список и карточка съехали вместе. Цена строгой фабрики — чуть больше кода ключей, зато нет «забыли обновить соседний экран».',
+            'After a mutation I invalidate through the feature key factory: orderKeys.list(filters) and orderKeys.detail(id), not ad-hoc strings, so the list and the detail refetch together. The cost of a strict factory is a bit more key code, but we stop forgetting a neighbour screen.',
+            'Po mutacji inwaliduję fabryką kluczy funkcji: orderKeys.list(filters) i orderKeys.detail(id), a nie stringami na oko, żeby lista i karta zeszły razem. Ceną twardej fabryki jest trochę więcej kodu kluczy, za to nie zapominamy o sąsiednim ekranie.',
+          ),
         ),
         node(
           'url',
@@ -404,6 +449,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Фильтры и пагинация переживают перезагрузку и шарятся ссылкой.', 'Filters and pagination survive reload and are shareable as a link.'),
           t('Локальный стор, если шаринг не нужен.', 'A local store if sharing is not needed.'),
           t('Где нормализуете пустые query params?', 'Where do you normalise empty query params?'),
+          t(
+            'Пустые query params нормализую на границе роутера — парсер URL сбрасывает blank в отсутствие ключа, чтобы /orders и /orders?status= не жили как два кэша. Цена — один общий парсер на фичу и чуть более строгие ссылки в тестах.',
+            'I normalise empty query params at the router boundary: the URL parser drops a blank to “key absent”, so /orders and /orders?status= are not two caches. The cost is one shared parser per feature and slightly stricter links in tests.',
+            'Puste query params normalizuję na granicy routera — parser URL zrzuca puste do braku klucza, żeby /orders i /orders?status= nie były dwoma cache’ami. Ceną jest jeden wspólny parser na funkcję i trochę ostrzejsze linki w testach.',
+          ),
         ),
         node(
           'local',
@@ -412,6 +462,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Локальный UI и формы не обязаны жить в глобальном сторе.', 'Local UI and forms do not belong in a global store.'),
           t('useReducer, если переходов много.', 'useReducer when there are many transitions.'),
           t('Почему инпут в Redux — красный флаг?', 'Why is an input in Redux a red flag?'),
+          t(
+            'Инпут в Redux — красный флаг, потому что каждый символ гоняет глобальный стор и подписчиков, хотя значение нужно только форме. Я оставляю черновик в useState или form-библиотеке; цена — форма не шарится между вкладками, и для нас это нормальный обмен.',
+            'An input in Redux is a red flag because every keystroke hits the global store and its subscribers, while only the form needs the value. I keep the draft in useState or a form library; the cost is that the form is not shared across tabs, which is a fair trade for us.',
+            'Input w Redux to czerwona flaga, bo każdy znak kręci globalnym storem i subskrybentami, choć wartość potrzebna jest tylko formularzowi. Szkic trzymam w useState albo bibliotece formularzy; ceną jest brak współdzielenia między kartami i ten wymiennik nam pasuje.',
+          ),
         ),
         node(
           'zustand',
@@ -420,6 +475,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Остаток клиентского глобального состояния обычно мал.', 'The leftover global client state is usually small.'),
           t('Redux Toolkit, когда клиентской логики много и нужны строгие паттерны.', 'Redux Toolkit when there is a lot of client logic and the team wants strict patterns.'),
           t('Что осталось в сторе после того, как сервер уехал в Query, а фильтры — в URL?', 'What is left in the store once the server is in Query and filters are in the URL?'),
+          t(
+            'После Query и URL в сторе остаётся узкий клиентский срез: мастер выбора, черновик мастера, флаг сайдбара — то, чего нет на сервере и нельзя шарить ссылкой. Цена такого стора — дисциплина не тащить туда кэш и фильтры «на всякий случай».',
+            'Once Query and the URL took their share, the store keeps a thin client slice: wizard selection, a draft, a sidebar flag — things that are not on the server and cannot live in a link. The cost is the discipline not to dump cache and filters there “just in case”.',
+            'Gdy Query i URL wzięły swoje, w store zostaje cienki client slice: wybór w kreatorze, szkic, flaga sidebara — to, czego nie ma na serwerze i nie da się wsadzić w link. Ceną jest dyscyplina, by nie wrzucać tam cache i filtrów „na wszelki wypadek”.',
+          ),
         ),
       ],
       edges: [
@@ -505,6 +565,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Статика и фоновая перегенерация, когда данные меняются нечасто.', 'Static files and background regeneration when data changes infrequently.'),
           t('SSR на каждый запрос, если данные персональные и свежие.', 'SSR on every request when data is personal and fresh.'),
           t('Какой stale-window вы готовы отдать каталогу?', 'What stale window will you accept for the catalogue?'),
+          t(
+            'Для каталога я готов отдать stale-window ISR в 5–10 минут: цена товара редко прыгает чаще, а TTFB и CDN-кэш важнее секундной свежести. Если акция или остаток должны быть точнее — вынесу их в остров с клиентским рефетчем, не ломая статику всей страницы.',
+            'For the catalogue I accept a 5–10 minute ISR stale window: prices rarely jump faster, and TTFB plus CDN cache beat second-level freshness. If a promo or stock must be tighter, I lift that into an island with a client refetch instead of breaking static HTML for the whole page.',
+            'Dla katalogu akceptuję stale-window ISR 5–10 minut: cena rzadko skacze częściej, a TTFB i cache CDN są ważniejsze niż świeżość co sekundę. Jeśli promocja albo stan magazynu muszą być ciaśniejsze, wynoszę je na wyspę z refetch po stronie klienta, nie łamiąc statyki całej strony.',
+          ),
         ),
         node(
           'ssr',
@@ -513,6 +578,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Сервер даёт HTML и, в RSC, компоненты без клиентского JS.', 'The server produces HTML and, with RSC, components with no client JS.'),
           t('CSR, если страница за логином и SEO не важно.', 'CSR if the page is behind login and SEO does not matter.'),
           t('Где проходит граница "use client"?', 'Where is the "use client" boundary?'),
+          t(
+            'Границу "use client" ставлю на интерактивном острове — фильтры, корзина, форма — а каталог и разметку оставляю серверными RSC без клиентского JS. Цена ранней границы — лишний бандл; цена слишком низкой — гидрация всего дерева и хуже INP.',
+            'I put the "use client" boundary on the interactive island — filters, cart, form — and leave the catalogue and layout as server RSC with no client JS. An early boundary costs extra bundle; a boundary that is too low hydrates the whole tree and hurts INP.',
+            'Granicę "use client" stawiam na interaktywnej wyspie — filtry, koszyk, formularz — a katalog i layout zostawiam jako serwerowe RSC bez JS klienta. Zbyt wysoka granica kosztuje zbędnym bundlem; zbyt niska hydruje całe drzewo i psuje INP.',
+          ),
         ),
         node(
           'csr',
@@ -521,6 +591,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Клиент рисует SPA или оживляет SSR HTML.', 'The client paints the SPA or hydrates SSR HTML.'),
           t('Острова, если интерактива мало.', 'Islands if there is little interactivity.'),
           t('Как ловите hydration mismatch в CI?', 'How do you catch a hydration mismatch in CI?'),
+          t(
+            'Hydration mismatch ловлю в CI двумя слоями: Playwright на критичных страницах падает на тексте ошибки гидрации, плюс запрет Date.now()/random в серверном дереве линтером. Цена — флаки, если тест зависит от часов, поэтому фикстуры времени общие для SSR и клиента.',
+            'I catch hydration mismatch in CI in two layers: Playwright on critical pages fails on the hydration error text, plus a lint ban on Date.now()/random in the server tree. The cost is flake if a test depends on the clock, so time fixtures are shared between SSR and the client.',
+            'Hydration mismatch łapię w CI dwiema warstwami: Playwright na krytycznych stronach pada na tekście błędu hydracji, plus zakaz Date.now()/random w drzewie serwera w linterze. Ceną są flaki, gdy test zależy od zegara, więc fixture czasu są wspólne dla SSR i klienta.',
+          ),
         ),
       ],
       edges: [
@@ -613,6 +688,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Не знает про HTTP, URL и DTO — только хук данных.', 'Does not know HTTP, URLs or DTOs — only a data hook.'),
           t('Прямой fetch в useEffect — это и есть антипаттерн слоя.', 'A raw fetch in useEffect is the layer antipattern.'),
           t('Что тестируете в компоненте, если сеть мокается на хуке?', 'What do you test in the component if the network is mocked at the hook?'),
+          t(
+            'Если сеть мокается на хуке, в компоненте проверяю состояния UI: скелетон, ошибка с повтором, пустой список и клик, который вызывает мутацию — не URL и не JSON. Цена — контракт хука надо держать стабильным, иначе тесты экрана зеленеют при сломанном транспорте.',
+            'With the network mocked at the hook, the component test covers UI states: skeleton, error-with-retry, empty list and the click that fires the mutation — not the URL or the JSON. The cost is that the hook contract must stay stable, or screen tests stay green while transport is broken.',
+            'Gdy sieć mockujemy na hooku, w komponencie sprawdzam stany UI: szkielet, błąd z ponowieniem, pustą listę i klik, który odpala mutację — nie URL i nie JSON. Ceną jest stabilny kontrakt hooka, inaczej testy ekranu zostają zielone przy zepsutym transporcie.',
+          ),
         ),
         node(
           'hooks',
@@ -621,6 +701,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Кэш, статусы, инвалидация; компоненты живут только здесь.', 'Cache, statuses, invalidation; components live only here.'),
           t('Ручной стор серверных данных — обычно хуже готового Query.', 'A hand-rolled store of server data is usually worse than Query.'),
           t('Как устроена фабрика query keys на фичу?', 'How is the per-feature query-key factory shaped?'),
+          t(
+            'Фабрика ключей на фичу выглядит как orderKeys.list(filters) и orderKeys.detail(id): префикс фичи плюс сегменты, чтобы инвалидация списка не задевала чужой кэш. Цена — ещё один модуль ключей, зато хуки useOrders() прячут форму ключа от компонентов.',
+            'The per-feature factory looks like orderKeys.list(filters) and orderKeys.detail(id): a feature prefix plus segments, so invalidating a list does not touch another cache. The cost is one more keys module, but useOrders() hides the key shape from components.',
+            'Fabryka kluczy na funkcję wygląda jak orderKeys.list(filters) i orderKeys.detail(id): prefiks funkcji plus segmenty, żeby inwalidacja listy nie ruszała cudzego cache. Ceną jest dodatkowy moduł kluczy, za to hooki useOrders() chowają kształt klucza przed komponentami.',
+          ),
         ),
         node(
           'modules',
@@ -629,6 +714,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Типы из OpenAPI, Zod, маппинг DTO в модель фронта.', 'Types from OpenAPI, Zod, DTO mapped to the frontend model.'),
           t('GraphQL-документы, если схема уже есть.', 'GraphQL documents if a schema already exists.'),
           t('Где правите переименование поля на бэкенде?', 'Where do you fix a renamed backend field?'),
+          t(
+            'Переименование поля на бэкенде правлю в доменном API-модуле: Zod/OpenAPI и маппинг DTO → модель фронта, а компоненты продолжают видеть старое имя. Цена слоя — ещё один маппер, зато дифф UI не размазывается по двадцати экранам.',
+            'I fix a renamed backend field in the domain API module: Zod/OpenAPI and the DTO-to-frontend mapper, while components keep the old name. The cost of the layer is one more mapper, but the UI diff does not smear across twenty screens.',
+            'Zmianę nazwy pola na backendzie poprawiam w domenowym module API: Zod/OpenAPI i mapowanie DTO → model frontu, a komponenty dalej widzą starą nazwę. Ceną warstwy jest dodatkowy mapper, za to diff UI nie rozlewa się na dwadzieścia ekranów.',
+          ),
         ),
         node(
           'transport',
@@ -637,6 +727,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Auth, retry, timeout, AbortController, correlation id.', 'Auth, retry, timeout, AbortController, correlation id.'),
           t('BFF, если экран собирает каскад сервисов.', 'A BFF if the screen fans out to many services.'),
           t('Кто обновляет access-токен при 401?', 'Who refreshes the access token on 401?'),
+          t(
+            'Access-токен при 401 обновляет один HTTP-транспорт: очередь запросов, refresh, повтор исходного вызова; компоненты и хуки об этом не знают. Цена централизации — одно место гонок при двух вкладках, поэтому refresh идёт через lock или BFF-cookie.',
+            'The access token on 401 is refreshed by the HTTP transport alone: queue the calls, refresh, retry the original; components and hooks never see it. The cost of that centre is a race across tabs, so refresh goes through a lock or a BFF cookie.',
+            'Access token przy 401 odświeża wyłącznie transport HTTP: kolejkuje requesty, robi refresh i ponawia wywołanie; komponenty i hooki tego nie widzą. Ceną centralizacji jest wyścig przy dwóch kartach, więc refresh idzie przez lock albo ciasteczko BFF.',
+          ),
         ),
       ],
       edges: [
@@ -718,6 +813,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Жёсткие границы и CODEOWNERS закрывают 80% орг-боли без MFE.', 'Strict boundaries and CODEOWNERS cover 80% of the org pain without MFE.'),
           t('MFE, когда команды реально блокируют релизы друг друга.', 'MFE when teams actually block each other’s releases.'),
           t('Какой сигнал заставил бы вас всё же резать на микрофронтенды?', 'What signal would still make you split into micro-frontends?'),
+          t(
+            'На микрофронтенды пойду, только если две команды стабильно блокируют общий релиз две недели и независимый деплой уже не решить пакетами и CODEOWNERS. Цена разреза — контракт shell, общая дизайн-система и операционная сложность, поэтому сигнал должен быть про поставку, не про модульность.',
+            'I would still split into micro-frontends only if two teams block a shared release for two weeks and packages plus CODEOWNERS cannot give independent deploy. The cost of the cut is a shell contract, a shared design system and ops load, so the signal must be about delivery, not folders.',
+            'Na mikrofrontendy pójdę tylko wtedy, gdy dwa zespoły regularnie blokują wspólny release przez dwa tygodnie, a pakiety i CODEOWNERS nie dają niezależnego deployu. Ceną cięcia jest kontrakt shella, wspólny design system i złożoność operacyjna, więc sygnał ma dotyczyć dostawy, nie folderów.',
+          ),
         ),
         node(
           'mono',
@@ -726,6 +826,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Атомарные PR, affected CI, remote cache.', 'Atomic PRs, affected CI, remote cache.'),
           t('Полирепо при независимых циклах поставки.', 'Polyrepo when delivery cycles are independent.'),
           t('Что будет с CI без affected и кэша?', 'What happens to CI without affected builds and a cache?'),
+          t(
+            'Без affected и remote cache монорепо-CI гоняет все пакеты на каждый PR и за год растёт с семи минут до получаса, а очередь убивает мелкие фичи. Цена внедрения Nx/Turborepo — настройка кэша и дисциплина графа, зато пайплайн снова ест только затронутое.',
+            'Without affected builds and a remote cache, monorepo CI runs every package on every PR and grows from seven minutes to half an hour in a year, and the queue kills small features. The cost of Nx/Turborepo is cache setup and graph discipline, but the pipeline then spends time only on what changed.',
+            'Bez affected i zdalnego cache CI monorepo odpalają wszystkie pakiety na każdy PR i w rok puchną z siedmiu minut do pół godziny, a kolejka zabija małe funkcje. Ceną Nx/Turborepo jest konfiguracja cache i dyscyplina grafu, za to pipeline zjada już tylko to, co się ruszyło.',
+          ),
         ),
         node(
           'shell',
@@ -734,6 +839,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Общий shell, дизайн-система и контракт, если независимый деплой обязателен.', 'Shared shell, design system and contract if independent deploy is mandatory.'),
           t('Edge routing по путям без runtime composition.', 'Edge routing by path without runtime composition.'),
           t('Как части общаются без общего глобального стора?', 'How do parts communicate without a shared global store?'),
+          t(
+            'Части MFE общаются через контракт shell: URL, custom events и крошечный typed bus на границе, без общего Redux. Цена — явные события и версия контракта, зато независимый деплой не ломается скрытой связью в сторе.',
+            'MFE parts talk through the shell contract: URL, custom events and a tiny typed bus at the boundary, not a shared Redux. The cost is explicit events and a contract version, but independent deploys are not coupled by a hidden store.',
+            'Części MFE rozmawiają przez kontrakt shella: URL, custom eventy i maleńki typowany bus na granicy, bez wspólnego Redux. Ceną są jawne zdarzenia i wersja kontraktu, za to niezależny deploy nie psuje się ukrytym sprzężeniem w store.',
+          ),
         ),
         node(
           'ds',
@@ -742,6 +852,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Токены, примитивы, Storybook — общая поверхность даже при MFE.', 'Tokens, primitives, Storybook — a shared surface even with MFE.'),
           t('Копипаст примитивов, пока потребителей мало.', 'Copied primitives while there are few consumers.'),
           t('Кто принимает новый компонент в систему?', 'Who accepts a new component into the system?'),
+          t(
+            'Новый компонент в дизайн-систему принимает владельческая DS-команда по RFC: токены, API, Storybook и два потребителя, иначе это ещё не система. Цена шлюза — фича ждёт ревью примитива, зато не плодим третью кнопку с другими отступами.',
+            'A new component enters the design system only through the owning DS team’s RFC: tokens, API, Storybook and two consumers, or it is not a system yet. The cost of that gate is that a feature waits on a primitive review, but we stop shipping a third button with different padding.',
+            'Nowy komponent do design systemu wpuszcza zespół-właściciel po RFC: tokeny, API, Storybook i dwóch konsumentów, inaczej to jeszcze nie system. Ceną bramki jest oczekiwanie funkcji na review prymitywu, za to nie mnożymy trzeciego przycisku z innymi odstępami.',
+          ),
         ),
       ],
       edges: [
@@ -818,6 +933,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Сначала полевые LCP, INP, CLS, потом гипотеза.', 'Field LCP, INP, CLS first, then a hypothesis.'),
           t('Только лабораторный Lighthouse без RUM — слепое пятно.', 'Lab-only Lighthouse without RUM is a blind spot.'),
           t('Какая метрика плохая у реальных пользователей и на каких страницах?', 'Which metric is bad for real users, and on which pages?'),
+          t(
+            'Сначала смотрю RUM: у нас плохой LCP на листинге каталога с мобильного 4G, а INP и CLS в норме — значит копаем hero и TTFB этой страницы, не «ускоряем всё». Цена полевых цифр — выборка и сегменты, зато не лечим лабораторный Lighthouse чужой страницы.',
+            'I start from RUM: LCP is bad on the catalogue listing on mobile 4G, while INP and CLS are fine — so we dig hero and TTFB on that page, not “make everything faster”. Field numbers cost sampling and segments, but we stop fixing a lab Lighthouse score on the wrong screen.',
+            'Zaczynam od RUM: zły jest LCP na liście katalogu na mobilnym 4G, a INP i CLS są w normie — więc kopiemy hero i TTFB tej strony, a nie „przyspieszamy wszystko”. Ceną liczb z pola są próbka i segmenty, za to nie leczymy laboratoryjnego Lighthouse na złym ekranie.',
+          ),
         ),
         node(
           'profile',
@@ -826,6 +946,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Диагностика ререндеров и длинных задач после RUM.', 'Diagnose re-renders and long tasks after RUM.'),
           t('Догадки про useMemo без профайлера.', 'Guessing at useMemo without a profiler.'),
           t('Это LCP, INP или CLS — и почему именно эта?', 'Is it LCP, INP or CLS — and why that one?'),
+          t(
+            'Это LCP, потому что RUM показывает медленный largest contentful paint на листинге, а профайлер уже после этого ищет hero и TTFB, не ререндеры. Цена узкой гипотезы — можем пропустить INP на чекауте, поэтому смотрим сегмент по страницам, а не одну среднюю.',
+            'It is LCP, because RUM shows a slow largest contentful paint on the listing, and only then does the profiler hunt the hero and TTFB, not re-renders. A narrow hypothesis can miss checkout INP, so we segment by page instead of one average.',
+            'To LCP, bo RUM pokazuje wolny largest contentful paint na liście, a profiler dopiero potem szuka hero i TTFB, nie rerenderów. Ceną wąskiej hipotezy jest ryzyko przegapienia INP na checkout, więc segmentujemy po stronach, a nie jedną średnią.',
+          ),
         ),
         node(
           'cdn',
@@ -834,6 +959,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Hero, шрифты, Brotli, hash-кэш — типичный рычаг LCP/CLS.', 'Hero, fonts, Brotli, hash cache — a typical LCP/CLS lever.'),
           t('SSR, если TTFB, а не картинка, держит LCP.', 'SSR if TTFB, not the image, holds LCP.'),
           t('Что preload, а что оставляете lazy?', 'What do you preload, and what stays lazy?'),
+          t(
+            'Preload ставлю на hero-картинку и шрифт заголовка листинга — они в LCP; ниже fold картинки и вторичные маршруты остаются lazy плюс prefetch по hover. Цена лишнего preload — конкуренция за канал и хуже LCP, поэтому в head только то, что рисует первый экран.',
+            'I preload the listing hero image and the heading font — they sit on LCP; below-the-fold images and secondary routes stay lazy, with hover prefetch. Extra preload competes for bandwidth and can worsen LCP, so the head only gets what paints the first screen.',
+            'Preload stawiam na obraz hero i font nagłówka listy — one siedzą na LCP; obrazki poniżej fold i drugorzędne trasy zostają lazy, plus prefetch po hover. Ceną zbędnego preload jest walka o łącze i gorszy LCP, więc w head trafia tylko to, co maluje pierwszy ekran.',
+          ),
         ),
         node(
           'budget',
@@ -842,6 +972,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Size-limit и Lighthouse в CI, чтобы исправление не откатилось.', 'Size-limit and Lighthouse in CI so the fix does not regress.'),
           t('Ручной аудит раз в квартал — поздно.', 'A quarterly manual audit is too late.'),
           t('Какой порог ломает сборку?', 'Which threshold fails the build?'),
+          t(
+            'Сборку ломает size-limit главного чанка выше согласованного порога — у нас 180 кБ gzip JS на каталог — и Lighthouse CI, если LCP в лаборатории уехал больше чем на 200 мс от базы. Цена жёсткого порога — иногда режем фичу или откладываем зависимость, зато регресс не приезжает «потом поправим».',
+            'The build fails when the main-chunk size-limit exceeds the agreed cap — 180 kB gzip JS on the catalogue for us — and when Lighthouse CI LCP drifts more than 200 ms from baseline. A hard gate sometimes means cutting a feature or delaying a dependency, but a regression does not land as “we’ll fix it later”.',
+            'Build łamie size-limit głównego chunka powyżej uzgodnionego progu — u nas 180 kB gzip JS na katalog — oraz Lighthouse CI, gdy LCP w laboratorium odjedzie o więcej niż 200 ms od bazy. Ceną twardego progu jest czasem obcięcie funkcji albo odłożenie zależności, za to regresja nie wjeżdża jako „poprawimy później”.',
+          ),
         ),
       ],
       edges: [
@@ -916,6 +1051,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Бесплатный класс ошибок: типы и границы модулей.', 'A free class of bugs: types and module boundaries.'),
           t('Только e2e без статики — дорого и дыряво.', 'E2e only, without static checks, is expensive and leaky.'),
           t('Что ещё кроме тестов ломает пайплайн?', 'Besides tests, what else fails the pipeline?'),
+          t(
+            'Кроме тестов пайплайн валят tsc, eslint границ модулей и size-limit: тип, цикл импортов или раздутый чанк не доезжают до e2e. Цена ранних гейтов — чуть больше красных PR, зато дорогие Playwright-минуты не жгут на заведомо сломанной сборке.',
+            'Besides tests, the pipeline fails on tsc, module-boundary ESLint and size-limit: a type error, an import cycle or a fat chunk never reaches e2e. Early gates cost a few more red PRs, but expensive Playwright minutes are not spent on a build that is already broken.',
+            'Oprócz testów pipeline wywalają tsc, ESLint granic modułów i size-limit: błąd typu, cykl importów albo spuchnięty chunk nie dojeżdża do e2e. Ceną wczesnych bramek jest trochę więcej czerwonych PR, za to drogie minuty Playwright nie palą się na z góry zepsutym buildzie.',
+          ),
         ),
         node(
           'integration',
@@ -924,6 +1064,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Основной объём trophy: поведение глазами пользователя.', 'The bulk of the trophy: behaviour through the user’s eyes.'),
           t('Мелкие enzyme-снимки реализации — хрупко.', 'Tiny enzyme snapshots of implementation are brittle.'),
           t('Почему мокаете сеть на MSW, а не в компоненте?', 'Why mock the network with MSW rather than inside the component?'),
+          t(
+            'Сеть мокаю MSW, а не внутри компонента, чтобы тест шёл тем же fetch/XHR, что и прод, и ловил маппинг DTO и статусы, а не подменённый хук. Цена — контракт хендлеров надо держать рядом с API-модулем, зато рефакторинг транспорта не зеленит ложные тесты.',
+            'I mock the network with MSW, not inside the component, so the test walks the same fetch/XHR as production and sees DTO mapping and statuses, not a stubbed hook. The cost is keeping handlers next to the API module, but a transport refactor does not leave false-green tests.',
+            'Sieć mockuję MSW, a nie w komponencie, żeby test szedł tym samym fetch/XHR co produkcja i widział mapowanie DTO oraz statusy, a nie podstawiony hook. Ceną jest trzymanie handlerów przy module API, za to refaktor transportu nie zostawia fałszywie zielonych testów.',
+          ),
         ),
         node(
           'e2e',
@@ -932,6 +1077,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Мало сценариев: логин, оплата, checkout — они медленные и хрупкие.', 'Few flows: login, payment, checkout — they are slow and flaky.'),
           t('Полное UI-покрытие e2e не масштабируется.', 'Full UI coverage in e2e does not scale.'),
           t('Как карантините flaky-тест со владельцем и сроком?', 'How do you quarantine a flaky test with an owner and a deadline?'),
+          t(
+            'Flaky-тест уходит в карантин с CODEOWNER и датой: падает в отдельном джобе, не краснеет main, а через спринт либо чинится, либо удаляется — без вечного skip. Цена карантина — дыра в покрытии на время ремонта, поэтому в карантине только критичный сценарий с тикетом.',
+            'A flaky test is quarantined with a CODEOWNER and a date: it runs in a separate job, does not redden main, and within a sprint it is fixed or deleted — no eternal skip. Quarantine costs a coverage hole while we repair, so only a critical flow with a ticket goes there.',
+            'Flaky test idzie do kwarantanny z CODEOWNER i datą: leci w osobnym jobie, nie czerwieni main, a w sprint albo zostaje naprawiony, albo skasowany — bez wiecznego skip. Ceną kwarantanny jest dziura w pokryciu na czas naprawy, więc trafia tam tylko krytyczny scenariusz z ticketem.',
+          ),
         ),
         node(
           'flags',
@@ -940,6 +1090,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Деплой отделён от релиза, откат — выключатель, не revert всего CDN.', 'Deploy is split from release; rollback is a switch, not a full CDN revert.'),
           t('Canary без флагов, если изменение чисто инфраструктурное.', 'Canary without flags if the change is purely infrastructural.'),
           t('Кто владеет флагом и когда его удаляют?', 'Who owns the flag, and when is it deleted?'),
+          t(
+            'Флагом владеет команда фичи: заводит его в ADR/тикете, выкатывает и удаляет в следующем спринте после 100% rollout, иначе флаги становятся постоянным графом. Цена дисциплины — отдельный PR на выпил и риск забыть, поэтому lint и отчёт «флаг старше N дней» живут в CI.',
+            'The feature team owns the flag: they file it in an ADR/ticket, roll it out, and delete it the sprint after 100% rollout, or flags become a permanent graph. The cost is an extra removal PR and the risk of forgetting, so lint plus a “flag older than N days” report live in CI.',
+            'Flagą włada zespół funkcji: zakłada ją w ADR/tickecie, wylewa i usuwa w następnym sprincie po 100% rollout, inaczej flagi stają się wiecznym grafem. Ceną dyscypliny jest osobny PR na wycięcie i ryzyko zapomnienia, więc lint i raport „flaga starsza niż N dni” żyją w CI.',
+          ),
         ),
       ],
       edges: [
@@ -1020,6 +1175,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Клиент контролирует злоумышленник: проверки на клиенте — UX, не безопасность.', 'An attacker controls the client: client checks are UX, not security.'),
           t('Слепая вера в скрытые поля формы.', 'Blind trust in hidden form fields.'),
           t('Что останется безопасным, если XSS исполнит любой JS?', 'What stays safe if XSS can run arbitrary JS?'),
+          t(
+            'Если XSS исполнит любой JS, безопасным останется только то, чего нет в JS: httpOnly cookie / серверная сессия и проверка на API. Цена этой модели — CSRF и BFF, зато украденный скрипт не читает токен из localStorage.',
+            'If XSS can run arbitrary JS, only what JS cannot touch stays safe: an httpOnly cookie or server session and checks on the API. That model costs CSRF defence and often a BFF, but a stolen script cannot read a token from localStorage.',
+            'Jeśli XSS odpali dowolny JS, bezpieczne zostaje tylko to, czego JS nie widzi: ciasteczko httpOnly / sesja serwerowa i kontrola na API. Ceną tego modelu jest CSRF i często BFF, za to skradziony skrypt nie przeczyta tokenu z localStorage.',
+          ),
         ),
         node(
           'csp',
@@ -1028,6 +1188,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('XSS: санитизация HTML и строгий CSP с nonce / Trusted Types.', 'XSS: sanitise HTML and a strict CSP with nonce / Trusted Types.'),
           t('Только экранирование React, если HTML из CMS нет.', 'React escaping alone if there is no CMS HTML.'),
           t('Какой nonce/hash у инлайна и кто его выдаёт?', 'Which nonce/hash covers inline script, and who issues it?'),
+          t(
+            'Инлайн покрывает одноразовый nonce, который SSR/BFF кладёт в CSP и в тег скрипта на каждый ответ; хеш — только для редкого статичного инлайна. Цена nonce — нельзя кэшировать HTML как полностью статичный файл без edge, который подставляет значение.',
+            'Inline script is covered by a one-time nonce that SSR/BFF puts on both the CSP header and the script tag per response; a hash is only for rare static inline. The nonce costs fully-static HTML cache unless the edge stamps the value.',
+            'Inline pokrywa jednorazowy nonce, który SSR/BFF wkłada w CSP i w tag skryptu na każdą odpowiedź; hash zostawiam tylko dla rzadkiego statycznego inline. Ceną nonce jest to, że HTML nie cache’uje się jako czysty plik bez edge, który wstawia wartość.',
+          ),
         ),
         node(
           'bff',
@@ -1036,6 +1201,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Токены не в localStorage: сессия на сервере или httpOnly SameSite cookie.', 'Tokens not in localStorage: server session or httpOnly SameSite cookie.'),
           t('Короткоживущий JWT в памяти вкладки плюс refresh-ротация.', 'A short-lived JWT in tab memory plus refresh rotation.'),
           t('Как закрываете CSRF при cookie-сессии?', 'How do you close CSRF on a cookie session?'),
+          t(
+            'CSRF при cookie-сессии закрываю SameSite=Lax или Strict плюс double-submit/CSRF-токен на мутациях; чтение с другого origin cookie не отправит. Цена — сложнее кросс-доменный фронт, поэтому API и сайт сидят на общем сайте или идут через BFF.',
+            'I close CSRF on a cookie session with SameSite=Lax or Strict plus a double-submit/CSRF token on mutations; a foreign origin will not send the cookie on a simple read. The cost is a harder cross-domain frontend, so the API and the site share a site or go through a BFF.',
+            'CSRF przy sesji cookie zamykam SameSite=Lax albo Strict plus double-submit/token CSRF na mutacjach; obce origin nie wyśle ciasteczka przy zwykłym odczycie. Ceną jest trudniejszy frontend cross-domain, więc API i strona siedzą na wspólnej witrynie albo idą przez BFF.',
+          ),
         ),
         node(
           'api',
@@ -1044,6 +1214,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Авторизация и валидация всегда дублируются на сервере.', 'Authorisation and validation are always enforced on the server too.'),
           t('«Секретный» клиентский флаг роли — не защита.', 'A “secret” client role flag is not protection.'),
           t('Почему CORS не заменяет проверку Origin/сессии на API?', 'Why does CORS not replace Origin/session checks on the API?'),
+          t(
+            'CORS не заменяет проверку Origin и сессии, потому что это правило браузера: curl и свой сервер прочитают ответ без preflight. Авторизацию и CSRF я держу на API; CORS лишь сужает, какие сайты может читать пользовательский браузер.',
+            'CORS does not replace Origin or session checks because it is a browser rule: curl and a custom server read the response without a preflight. Authorisation and CSRF stay on the API; CORS only limits which sites the user’s browser may read.',
+            'CORS nie zastępuje kontroli Origin i sesji, bo to reguła przeglądarki: curl i własny serwer przeczytają odpowiedź bez preflight. Autoryzację i CSRF trzymam na API; CORS tylko ogranicza, które witryny może czytać przeglądarka użytkownika.',
+          ),
         ),
       ],
       edges: [
@@ -1165,6 +1340,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Where do you move focus after a route change?',
             'Gdzie przenosicie fokus po zmianie trasy?',
           ),
+          t(
+            'После смены маршрута переношу фокус на заголовок новой страницы (tabIndex={-1} и focus()), чтобы скринридер не остался в старом навбаре. Цена — один общий layout-эффект и дисциплина уникальных h1, зато клавиатурный пользователь не теряет место.',
+            'After a route change I move focus to the new page heading (tabIndex={-1} and focus()) so the screen reader does not stay in the old navbar. The cost is one shared layout effect and unique h1s, but a keyboard user does not lose their place.',
+            'Po zmianie trasy przenoszę fokus na nagłówek nowej strony (tabIndex={-1} i focus()), żeby czytnik ekranu nie został w starym navbarze. Ceną jest jeden wspólny efekt layoutu i unikalne h1, za to użytkownik klawiatury nie gubi miejsca.',
+          ),
         ),
         node(
           'ds',
@@ -1184,6 +1364,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Что остаётся на стороне продуктовой команды?',
             'What stays with the product team?',
             'Co zostaje po stronie zespołu produktowego?',
+          ),
+          t(
+            'На продуктовой команде остаются смысл страницы, порядок заголовков, тексты ошибок и уникальные сценарии, а не второй combobox. Цена разделения — фича всё равно вручную прогоняет свой поток, зато примитив чинится один раз в дизайн-системе.',
+            'The product team still owns page meaning, heading order, error copy and unique flows, not a second combobox. The split still costs a manual pass on the feature flow, but the primitive is fixed once in the design system.',
+            'Po stronie zespołu produktowego zostają sens strony, kolejność nagłówków, teksty błędów i unikalne scenariusze, a nie drugi combobox. Ceną podziału jest ręczny przebieg własnego flow, za to prymityw naprawia się raz w design systemie.',
           ),
         ),
         node(
@@ -1205,6 +1390,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Which violations fail the build and which only warn?',
             'Które naruszenia blokują build, a które tylko ostrzegają?',
           ),
+          t(
+            'Сборку ломают серьёзные axe-нарушения на критичных маршрутах — нет имени у кнопки, сломанный контраст на CTA — а minor и экспериментальные правила идут warning. Цена жёсткого гейта — иногда чиним ложные срабатывания, зато регресс клавиатуры не уезжает на прод.',
+            'Serious axe violations on critical routes fail the build — a nameless button, broken CTA contrast — while minor and experimental rules only warn. A hard gate costs occasional false-positive fixes, but a keyboard regression does not ship.',
+            'Build łamią poważne naruszenia axe na krytycznych trasach — brak nazwy przycisku, zepsuty kontrast CTA — a reguły minor i eksperymentalne tylko ostrzegają. Ceną twardej bramki są czasem poprawki fałszywych alarmów, za to regresja klawiatury nie wjeżdża na produkcję.',
+          ),
         ),
         node(
           'manual',
@@ -1224,6 +1414,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'При каком сигнале вы вводите аудит и a11y-ownership?',
             'At what signal do you add audits and a11y ownership?',
             'Przy jakim sygnale wprowadzacie audyt i ownership dostępności?',
+          ),
+          t(
+            'Аудит и a11y-ownership ввожу, когда ручной прогон два раза подряд находит то, что axe пропустил, или появляется регуляторный контекст вроде EAA. Цена ownership — слот в спринте и внешний аудит раз в квартал, зато критичные сценарии больше не чинятся «как успеем».',
+            'I add audits and a11y ownership when a manual pass twice in a row finds what axe missed, or a regulatory context such as the EAA appears. Ownership costs a sprint slot and a quarterly external audit, but critical flows are no longer fixed “when we have time”.',
+            'Audyt i ownership dostępności wprowadzam, gdy ręczny przegląd dwa razy z rzędu znajduje to, co axe przepuścił, albo pojawia się kontekst regulacyjny jak EAA. Ceną ownership jest slot w sprincie i zewnętrzny audyt co kwartał, za to krytyczne scenariusze nie są już łatane „jak zdążymy”.',
           ),
         ),
       ],
@@ -1347,6 +1542,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'How do you show a write is not yet confirmed?',
             'Jak pokazujecie, że zapis nie został jeszcze potwierdzony?',
           ),
+          t(
+            'Неподтверждённую запись показываю тем же рядом с меткой pending и возможностью повтора, без притворения, что сервер уже принял. Цена честного статуса — чуть больше состояний UI, зато пользователь не думает, что оплата прошла, пока outbox ещё в очереди.',
+            'I show an unconfirmed write on the same row with a pending mark and a retry, without pretending the server already accepted it. Honest status costs more UI states, but the user does not think a payment went through while the outbox is still queued.',
+            'Niepotwierdzony zapis pokazuję w tym samym wierszu ze znacznikiem pending i ponowieniem, bez udawania, że serwer już przyjął. Ceną szczerego statusu jest więcej stanów UI, za to użytkownik nie myśli, że płatność przeszła, gdy outbox jeszcze stoi w kolejce.',
+          ),
         ),
         node(
           'sw',
@@ -1366,6 +1566,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Какую стратегию вы выберете для списка, а какую для платежа?',
             'Which strategy do you pick for a list and which for a payment?',
             'Jaką strategię wybierzecie dla listy, a jaką dla płatności?',
+          ),
+          t(
+            'Для списка беру stale-while-revalidate: показать кэш сразу и обновить в фоне; для платежа — network-only без кэша записи, иначе рискнуть двойным списанием. Цена разделения — две стратегии в service worker и дисциплина не класть POST в Cache API.',
+            'For a list I pick stale-while-revalidate: show the cache at once and refresh in the background; for a payment, network-only with no write cache, or we risk a double charge. The split costs two strategies in the service worker and a ban on putting POST in the Cache API.',
+            'Dla listy biorę stale-while-revalidate: pokazać cache od razu i odświeżyć w tle; dla płatności — network-only bez cache zapisu, inaczej ryzyko podwójnego pobrania. Ceną podziału są dwie strategie w service workerze i zakaz wrzucania POST do Cache API.',
           ),
         ),
         node(
@@ -1387,6 +1592,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Who replays the queue when several tabs are open?',
             'Kto odtwarza kolejkę, gdy otwartych jest kilka kart?',
           ),
+          t(
+            'Очередь проигрывает одна вкладка через Web Locks или leader election на BroadcastChannel, остальные только читают статус из IndexedDB. Цена лидера — сложнее тесты с двумя вкладками, зато нет двойного replay одного действия.',
+            'One tab replays the queue via Web Locks or leader election on BroadcastChannel; the others only read status from IndexedDB. A leader costs harder two-tab tests, but we do not double-replay one action.',
+            'Kolejkę odtwarza jedna karta przez Web Locks albo wybór lidera na BroadcastChannel, pozostałe tylko czytają status z IndexedDB. Ceną lidera są trudniejsze testy z dwiema kartami, za to nie ma podwójnego replay jednej akcji.',
+          ),
         ),
         node(
           'api',
@@ -1406,6 +1616,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Что видит пользователь при 409 после reconnect?',
             'What does the user see on a 409 after reconnect?',
             'Co widzi użytkownik przy 409 po reconnect?',
+          ),
+          t(
+            'При 409 после reconnect показываю конфликт на том же черновике: серверная версия, локальная и выбор «оставить сервер» или смержить поля, без тихого last-write-wins. Цена — ещё один экран конфликта и обучение, зато пользователь не теряет правку молча.',
+            'On a 409 after reconnect I show a conflict on the same draft: server version, local version and a choice to keep the server or merge fields, not silent last-write-wins. That costs a conflict screen and some teaching, but the user does not lose an edit quietly.',
+            'Przy 409 po reconnect pokazuję konflikt na tym samym szkicu: wersja serwera, lokalna i wybór „zostaw serwer” albo zmerguj pola, bez cichego last-write-wins. Ceną jest dodatkowy ekran konfliktu i trochę edukacji, za to użytkownik nie traci edycji po cichu.',
           ),
         ),
       ],
@@ -1533,6 +1748,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'How do you redirect the first visitor and remember the choice?',
             'Jak przekierowujecie pierwszego odwiedzającego i zapamiętujecie wybór?',
           ),
+          t(
+            'Первого посетителя редиректлю с / на /pl или /en по Accept-Language один раз, а выбор дальше живёт в URL плюс cookie только как подсказка для следующего захода. Цена — первый hop и аккуратность с SEO (hreflang, не индексировать голый /), зато ссылка однозначна и CDN кэширует локаль.',
+            'I redirect the first visitor from / to /pl or /en once via Accept-Language, and the choice then lives in the URL, with a cookie only as a hint on the next visit. That costs a first hop and SEO care (hreflang, do not index bare /), but the link is unambiguous and the CDN can cache the locale.',
+            'Pierwszego odwiedzającego przekierowuję z / na /pl albo /en raz po Accept-Language, a wybór dalej żyje w URL; cookie jest tylko podpowiedzią na następną wizytę. Ceną jest pierwszy hop i ostrożność SEO (hreflang, nie indeksować gołego /), za to link jest jednoznaczny i CDN może cache’ować locale.',
+          ),
         ),
         node(
           'dict',
@@ -1552,6 +1772,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Как SSR получает тот же словарь, что и клиент?',
             'How does SSR get the same dictionary as the client?',
             'Jak SSR dostaje ten sam słownik co klient?',
+          ),
+          t(
+            'SSR берёт тот же чанк словаря, что и клиент: локаль из URL выбирает модуль, сервер импортирует его в запрос, клиент гидратится тем же JSON, без второго fetch. Цена — словари должны быть изоморфными и лежать рядом с маршрутом, иначе будет hydration mismatch на строке.',
+            'SSR loads the same dictionary chunk as the client: locale from the URL picks the module, the server imports it for the request, and the client hydrates that JSON with no second fetch. Dictionaries must be isomorphic and sit next to the route, or a string becomes a hydration mismatch.',
+            'SSR bierze ten sam chunk słownika co klient: locale z URL wybiera moduł, serwer importuje go w requeście, klient hydruje ten sam JSON bez drugiego fetcha. Ceną jest to, że słowniki muszą być izomorficzne i leżeć przy trasie, inaczej string zrobi hydration mismatch.',
           ),
         ),
         node(
@@ -1573,6 +1798,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'How do you translate “1 file, 2 files, 5 files”?',
             'Jak przetłumaczycie „1 plik, 2 pliki, 5 plików”?',
           ),
+          t(
+            '«1 файл, 2 файла, 5 файлов» перевожу одним ICU-сообщением с plural, а не склейкой числа и слова: язык сам выбирает форму, переводчик правит фразу целиком. Цена ICU — переводчикам нужен контекст плейсхолдеров, зато польский и русский не ломаются на «2 files».',
+            'I translate “1 file, 2 files, 5 files” as one ICU plural message, not number-plus-word concatenation: the locale picks the form and the translator edits the whole phrase. ICU costs placeholder context for translators, but Polish and Russian do not break on “2 files”.',
+            '„1 plik, 2 pliki, 5 plików” tłumaczę jednym komunikatem ICU z plural, a nie sklejką liczby i słowa: locale samo wybiera formę, tłumacz poprawia całe zdanie. Ceną ICU jest kontekst placeholdera dla tłumaczy, za to polski i rosyjski nie łamią się na „2 files”.',
+          ),
         ),
         node(
           'ci',
@@ -1592,6 +1822,11 @@ export const TOPICS: Record<TopicId, Topic> = {
             'Какая проверка упадёт, если ключа нет в польском словаре?',
             'Which check fails when a key is missing from the Polish dictionary?',
             'Która kontrola padnie, gdy klucza brakuje w polskim słowniku?',
+          ),
+          t(
+            'Если ключа нет в польском словаре, падает сверка ключей в CI — diff en/ru/pl — а не рантайм с пустой строкой на проде. Цена гейта — перевод должен приехать в том же PR, что и ключ, либо ключ сидит за флагом до готовности локали.',
+            'If a key is missing from the Polish dictionary, the key-parity check fails in CI — a diff of en/ru/pl — instead of an empty string in production. The gate costs shipping the translation in the same PR as the key, or parking the key behind a flag until the locale is ready.',
+            'Gdy klucza brakuje w polskim słowniku, pada kontrola zgodności kluczy w CI — diff en/ru/pl — a nie pusty string na produkcji. Ceną bramki jest tłumaczenie w tym samym PR co klucz, albo klucz siedzi za flagą do gotowości locale.',
           ),
         ),
       ],
@@ -1679,6 +1914,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Крупное изменение сначала обсуждается с затронутыми командами.', 'A large change is discussed with affected teams first.'),
           t('Сразу ADR без фидбека — для локального решения.', 'Jump straight to an ADR for a local decision.'),
           t('Кто из команд обязан ответить на RFC?', 'Which teams must reply to the RFC?'),
+          t(
+            'На RFC обязаны ответить команды, чей код, контракт или пайплайн режется — CODEOWNERS затронутых пакетов и платформа, если меняется shell. Цена обязательного круга — день-два на фидбек, зато не всплывает сюрприз после merge в чужом релизе.',
+            'Teams whose code, contract or pipeline is cut must reply to the RFC — CODEOWNERS of affected packages and the platform team if the shell moves. A required circle costs a day or two of feedback, but a surprise does not appear in someone else’s release after merge.',
+            'Na RFC muszą odpowiedzieć zespoły, których kod, kontrakt albo pipeline jest cięty — CODEOWNERS ruszonych pakietów i platforma, jeśli rusza się shell. Ceną obowiązkowego kręgu jest dzień albo dwa na feedback, za to po merge nie wychodzi niespodzianka w cudzym releasie.',
+          ),
         ),
         node(
           'adr',
@@ -1687,6 +1927,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Контекст, варианты, решение, последствия и владелец живут рядом с кодом.', 'Context, options, decision, consequences and owner live next to the code.'),
           t('Confluence без связи с PR быстро устаревает.', 'Confluence with no PR link goes stale fast.'),
           t('При каком сигнале ADR пересматривают?', 'What signal triggers revisiting the ADR?'),
+          t(
+            'ADR пересматриваю, когда метрика из секции последствий сломалась — lead time, LCP, число команд на один PR — или появился новый constraint вроде независимого деплоя. Цена явного сигнала — какое-то время живём со старым решением, зато не переписываем документ каждую неделю.',
+            'I revisit an ADR when a metric from the consequences section broke — lead time, LCP, teams per PR — or a new constraint such as independent deploy appeared. Waiting for that signal means living with the old call for a while, instead of rewriting the doc every week.',
+            'ADR rewiduję, gdy metryka z sekcji konsekwencji się zepsuła — lead time, LCP, liczba zespołów na PR — albo pojawił się nowy constraint jak niezależny deploy. Ceną jawnego sygnału jest jakiś czas ze starym wyborem, za to nie przepisujemy dokumentu co tydzień.',
+          ),
         ),
         node(
           'strangler',
@@ -1695,6 +1940,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Новое пишем по-новому, старое вытесняем; линтер запрещает старый паттерн.', 'New code follows the new path, old code is displaced; lint bans the old pattern.'),
           t('Большое переписывание — почти всегда ошибка.', 'A big-bang rewrite is almost always a mistake.'),
           t('Какая метрика в CI показывает, что миграция не зависла на 80%?', 'Which CI metric shows the migration is not stuck at 80%?'),
+          t(
+            'Что миграция не зависла на 80%, показывает счётчик старого паттерна в CI: число запрещённых импортов или файлов вне нового слайса должно падать каждый спринт. Цена метрики — иногда чиним исключения в allowlist, зато «почти готово» нельзя прятать бесконечно.',
+            'That the migration is not stuck at 80% is a CI count of the old pattern: forbidden imports or files outside the new slice must fall every sprint. The metric costs occasional allowlist fixes, but “almost done” cannot hide forever.',
+            'Że migracja nie utknęła na 80%, pokazuje licznik starego wzorca w CI: liczba zakazanych importów albo plików poza nowym slajsem ma spadać co sprint. Ceną metryki są czasem poprawki wyjątków na allowliście, za to „prawie gotowe” nie schowa się w nieskończoność.',
+          ),
         ),
         node(
           'ci',
@@ -1703,6 +1953,11 @@ export const TOPICS: Record<TopicId, Topic> = {
           t('Правила автоматизированы, иначе живут, пока автор в команде.', 'Rules are automated, or they live only while the author stays.'),
           t('Только code review без линтеров границ.', 'Code review only, with no boundary linters.'),
           t('Как онбординг находит ADR и шаблон фичи за минуты?', 'How does onboarding find the ADR and the feature generator in minutes?'),
+          t(
+            'Онбординг находит ADR и генератор фичи из README корня: ссылка на docs/adr и команда `pnpm gen feature`, плюс шаблон в CI, который падает, если слайс без публичного API. Цена — держать индекс в репозитории, зато новый человек не ищет Confluence и не копирует фичу руками.',
+            'Onboarding finds the ADR and the feature generator from the root README: a link to docs/adr and `pnpm gen feature`, plus a CI template that fails a slice without a public API. The cost is keeping that index in the repo, but a new hire does not hunt Confluence or copy a feature by hand.',
+            'Onboarding znajduje ADR i generator funkcji z README w korzeniu: link do docs/adr i komenda `pnpm gen feature`, plus szablon w CI, który pada, gdy slajs nie ma publicznego API. Ceną jest utrzymanie indeksu w repo, za to nowa osoba nie szuka Confluence i nie kopiuje funkcji ręcznie.',
+          ),
         ),
       ],
       edges: [

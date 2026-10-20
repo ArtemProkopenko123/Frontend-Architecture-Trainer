@@ -88,6 +88,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Страница собирает список и не ходит в HTTP напрямую.', 'The page composes the list and never talks HTTP itself.'),
           t('Отдельный layout-маршрут, если лента вложена в shell приложения.', 'A nested layout route if the feed sits inside an app shell.'),
           t('Что остаётся на странице, а что уезжает в FeedList при росте фичи?', 'What stays on the page versus moving into FeedList as the feature grows?'),
+          t(
+            'Пока лента одна, на FeedPage оставляю маршрут, шапку и хук infinite query, а список, виртуализацию и восстановление скролла уезжают в FeedList. Цена — лишний слой композиции, зато страница не распухает от деталей рендера.',
+            'While there is one feed, FeedPage keeps the route, chrome and the infinite-query hook; list, virtualisation and scroll restore move into FeedList. The cost is an extra composition layer, but the page does not absorb render details.',
+            'Dopóki jest jeden feed, na FeedPage zostawiam trasę, chrome i hook infinite query, a lista, wirtualizacja i przywracanie scrolla idą do FeedList. Koszt to dodatkowa warstwa kompozycji, ale strona nie puchnie od szczegółów renderu.',
+          ),
         ),
         node(
           'feedList',
@@ -96,6 +101,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Виртуализированный список страниц infinite query.', 'Virtualised list of infinite-query pages.'),
           t('Обычный map без виртуализации, пока постов мало.', 'A plain map without virtualisation while the list is small.'),
           t('Как восстанавливаете позицию скролла после возврата с карточки?', 'How do you restore scroll after returning from a post?'),
+          t(
+            'Позицию храню в sessionStorage или в состоянии роутера по ключу ленты и восстанавливаю после монтирования виртуализированного списка, а не через голый window.scroll. Цена — нужно дождаться измерения высот строк, иначе якорь прыгает.',
+            'I store the offset in sessionStorage or router state keyed by the feed and restore it after the virtualised list mounts, not via a raw window.scroll. The cost is waiting for row measurements, otherwise the anchor jumps.',
+            'Offset trzymam w sessionStorage albo w stanie routera pod kluczem feedu i przywracam po zamontowaniu zwirtualizowanej listy, nie przez goły window.scroll. Koszt: trzeba poczekać na pomiary wysokości wierszy, inaczej kotwica skacze.',
+          ),
         ),
         node(
           'postCard',
@@ -104,6 +114,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Карточка читает пост из кэша Query и шлёт оптимистичный лайк.', 'The card reads the post from the Query cache and sends an optimistic like.'),
           t('Разнести медиа и действия в слоты, если карточка разрастётся.', 'Split media and actions into slots if the card grows.'),
           t('Как откатываете лайк и не ломаете фокус на mobile?', 'How do you roll back a like without breaking focus on mobile?'),
+          t(
+            'Лайк патчу оптимистично в кэше Query по id поста и при ошибке откатываю только likeCount и likedByMe, не размонтируя карточку и не меняя порядок. Фокус остаётся на кнопке; цена — аккуратный merge вместо invalidate, иначе список перерисуется и фокус уедет.',
+            'I patch the Query cache by post id optimistically and on error roll back only likeCount and likedByMe without unmounting the card or reordering. Focus stays on the button; the cost is a careful cache merge instead of invalidate, or the list remounts and focus is lost.',
+            'Like aktualizuję optymistycznie w cache Query po id posta, przy błędzie cofam tylko likeCount i likedByMe, bez odmontowania karty i bez zmiany kolejności. Fokus zostaje na przycisku; koszt to ostrożny merge zamiast invalidate, inaczej lista się przerysuje i fokus ucieknie.',
+          ),
         ),
         node(
           'query',
@@ -112,6 +127,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Единственный источник данных для UI: страницы, статусы, инвалидация.', 'The only data source for the UI: pages, statuses, invalidation.'),
           t('SWR или RTK Query с infinite-пагинацией.', 'SWR or RTK Query with infinite pagination.'),
           t('Как ключ кэша связан с курсором и как вытесняете старые страницы?', 'How does the cache key relate to the cursor, and how do you evict old pages?'),
+          t(
+            'Ключ бесконечного запроса — фид и фильтры, курсор живёт внутри страниц, а не в ключе, иначе каждая страница станет отдельным кэшем. Старые страницы вытесняю maxPages или splice после длинного скролла; цена — возврат назад снова догрузит хвост.',
+            'The infinite-query key is the feed and filters; the cursor lives inside pages, not in the key, or every page becomes its own cache. I evict old pages with maxPages or a splice after a long scroll; the cost is that going back refetches the tail.',
+            'Klucz infinite query to feed i filtry; kursor żyje wewnątrz stron, nie w kluczu, bo inaczej każda strona to osobny cache. Stare strony wypycham maxPages albo ręcznym splice po długim scrollu; koszt — cofnięcie się ponownie dociągnie ogon.',
+          ),
         ),
         node(
           'bff',
@@ -120,6 +140,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Агрегирует ленту под экран, скрывает каскад микросервисов.', 'Aggregates the feed for the screen and hides a microservice waterfall.'),
           t('Прямой HTTP к API, если бэкенд уже отдаёт готовую ленту.', 'Direct HTTP to the API if the backend already serves a ready-made feed.'),
           t('Что кэшируется на BFF и как инвалидируется после лайка?', 'What is cached on the BFF, and how is it invalidated after a like?'),
+          t(
+            'На BFF кэширую собранную страницу ленты по курсору на коротком TTL и не кэширую likedByMe — это персональное поле. После лайка инвалидирую только счётчик точечным патчем или коротким TTL, а не весь фид; цена — краткая рассинхронизация счётчика.',
+            'The BFF caches the assembled feed page by cursor with a short TTL and does not cache likedByMe — that field is personal. After a like I invalidate only the count via a patch or short TTL, not the whole feed; the cost is a brief count skew.',
+            'Na BFF cache\'uję złożoną stronę feedu po kursorze z krótkim TTL i nie cache\'uję likedByMe — to pole osobiste. Po like invaliduję tylko licznik przez punktowy patch albo krótki TTL, nie cały feed; koszt to krótka rozbieżność licznika.',
+          ),
         ),
         node(
           'api',
@@ -128,6 +153,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Cursor-лента и мутации; контракт стабилен при вставках сверху.', 'Cursor feed and mutations; the contract stays stable when items insert on top.'),
           t('GraphQL-лента, если клиентам нужны разные поля поста.', 'A GraphQL feed if clients need different post fields.'),
           t('Почему cursor, а не offset, когда сверху постоянно появляются посты?', 'Why cursor rather than offset when posts keep appearing on top?'),
+          t(
+            'Offset плывёт: новый пост сверху сдвигает страницы и даёт дыры и дубли. Курсор по id или createdAt стабилен при вставках сверху; цена — нельзя прыгнуть на произвольную страницу и сложнее показать «страница 5 из N».',
+            'Offset drifts: a new top post shifts pages and creates holes and duplicates. A cursor on id or createdAt stays stable when items insert on top; the cost is no jump to page N and a harder “page 5 of N” UI.',
+            'Offset pływa: nowy post u góry przesuwa strony i daje dziury oraz duplikaty. Kursor po id albo createdAt jest stabilny przy wstawkach z góry; koszt — nie skoczysz na dowolną stronę i trudniej pokazać „strona 5 z N”.',
+          ),
         ),
         node(
           'sse',
@@ -136,6 +166,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Новые посты приходят в кэш Query, UI показывает плашку, а не прыгает скролл.', 'New posts land in the Query cache; the UI shows a banner instead of jumping scroll.'),
           t('Короткий polling или WebSocket, если канал уже есть в продукте.', 'Short polling or WebSocket if the product already has a channel.'),
           t('Как догружаете пропуски после обрыва SSE?', 'How do you catch up after an SSE drop?'),
+          t(
+            'Храню lastEventId или id последнего поста в кэше и после reconnect делаю короткий HTTP catch-up, затем снова открываю SSE. Цена — один лишний запрос и окно, где плашка «N новых» важнее мгновенной вставки.',
+            'I keep lastEventId or the last post id in cache and after reconnect run a short HTTP catch-up, then reopen SSE. The cost is one extra request and a window where an “N new” banner beats instant insert.',
+            'Trzymam lastEventId albo id ostatniego posta w cache i po reconnect robię krótki HTTP catch-up, potem znów otwieram SSE. Koszt to jedno dodatkowe żądanie i okno, w którym pasek „N nowych” jest ważniejszy niż natychmiastowy wstaw.',
+          ),
         ),
       ],
       edges: [
@@ -196,6 +231,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Поле и listbox; клавиатура и ARIA живут здесь.', 'Input and listbox; keyboard and ARIA live here.'),
           t('Нативный datalist — слишком бедный для подсветки и недавних запросов.', 'Native datalist is too weak for highlighting and recent queries.'),
           t('Как ведёте aria-activedescendant при виртуализации списка?', 'How do you keep aria-activedescendant correct if the list is virtualised?'),
+          t(
+            'Активный option всегда монтирую, даже если соседние строки вытеснены виртуализацией, и ставлю aria-activedescendant на его стабильный id. Цена — окно виртуализации чуть шире вокруг фокуса и нельзя переиспользовать один DOM-узел для всех option.',
+            'I keep the active option mounted even if neighbours are virtualised away and point aria-activedescendant at its stable id. The cost is a slightly wider virtual window around focus and no recycling one DOM node for every option.',
+            'Aktywną option zawsze montuję, nawet gdy sąsiednie wiersze wylecą z wirtualizacji, i ustawiam aria-activedescendant na jej stabilne id. Koszt — nieco szersze okno wirtualizacji wokół fokusu i brak recyklingu jednego węzła DOM dla wszystkich option.',
+          ),
         ),
         node(
           'debounce',
@@ -204,6 +244,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('200–300 мс задержки и отмена предыдущего fetch защищают от гонок.', 'A 200–300 ms delay and aborting the previous fetch protect against races.'),
           t('TanStack Query сам отменяет по ключу, если подсказки живут в Query.', 'TanStack Query already aborts by key if suggestions live in Query.'),
           t('Что делаете на compositionstart/compositionend для IME?', 'What do you do on compositionstart/compositionend for IME?'),
+          t(
+            'На compositionstart ставлю флаг и не запускаю debounce и fetch, на compositionend снимаю флаг и планирую запрос с финальной строкой. Цена — чуть более сложный автомат ввода, зато нет сломанных запросов на каждый иероглиф IME.',
+            'On compositionstart I set a flag and skip debounce and fetch; on compositionend I clear it and schedule a request with the final string. The cost is a slightly richer input state machine, but no broken requests on every IME glyph.',
+            'Na compositionstart stawiam flagę i nie odpalam debounce ani fetch, na compositionend zdejmuję ją i planuję request z finalnym stringiem. Koszt to trochę bogatszy automat stanu inputu, za to nie ma popsutych zapytań na każdy znak IME.',
+          ),
         ),
         node(
           'lru',
@@ -212,6 +257,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Кэш подсказок по строке запроса в памяти.', 'In-memory cache of suggestions keyed by query string.'),
           t('SessionStorage, если кэш должен пережить перезагрузку вкладки.', 'SessionStorage if the cache should survive a tab reload.'),
           t('Какой размер LRU и как инвалидируете после смены локали?', 'What size is the LRU, and how do you invalidate after a locale change?'),
+          t(
+            'Держу LRU на 50–100 ключей query→items в памяти вкладки и сбрасываю целиком при смене локали или словаря, потому что подписи и ранжирование другие. Цена — после смены языка первый ввод снова бьёт API.',
+            'I keep an in-tab LRU of 50–100 query-to-items entries and wipe it on locale or dictionary change because labels and ranking differ. The cost is that the first typed query after a language switch hits the API again.',
+            'Trzymam LRU 50–100 kluczy query→items w pamięci karty i czyszczę całość przy zmianie locale albo słownika, bo etykiety i ranking są inne. Koszt — po zmianie języka pierwsze wpisanie znów uderza w API.',
+          ),
         ),
         node(
           'api',
@@ -220,6 +270,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Короткий GET по префиксу; лимит маленький.', 'A short GET by prefix; the limit stays small.'),
           t('Поиск на клиенте по уже загруженному словарю, если словарь крошечный.', 'Client-side search over a loaded dictionary if it is tiny.'),
           t('Есть ли rate limit и что видит пользователь при 429?', 'Is there a rate limit, and what does the user see on 429?'),
+          t(
+            'На префиксный suggest почти всегда есть rate limit; при 429 не чищу поле, показываю тихое состояние ошибки списка и временно увеличиваю debounce. Цена — несколько секунд без свежих подсказок, зато инпут остаётся живым.',
+            'Prefix suggest almost always has a rate limit; on 429 I do not clear the input, I show a quiet list error and temporarily raise debounce. The cost is stale suggestions for a few seconds, but the field stays usable.',
+            'Prefix suggest niemal zawsze ma rate limit; przy 429 nie czyszczę pola, pokazuję cichy stan błędu listy i chwilowo zwiększam debounce. Koszt — użytkownik może nie zobaczyć świeżych podpowiedzi przez kilka sekund, ale input zostaje żywy.',
+          ),
         ),
       ],
       edges: [
@@ -274,6 +329,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Список диалогов и непрочитанные из нормализованного стора.', 'Conversation list and unreads from the normalised store.'),
           t('Виртуальный список, если диалогов тысячи.', 'A virtual list if there are thousands of conversations.'),
           t('Как сортируете диалоги при входящем сообщении, не дёргая весь список?', 'How do you reorder on inbound mail without thrashing the whole list?'),
+          t(
+            'Диалоги храню в Map по id плюс отдельный индекс lastMessageAt и при входящем двигаю только один id в начало индекса. Цена — два представления одних данных, зато нет полной сортировки тысяч строк на каждое сообщение.',
+            'I keep conversations in a Map by id plus a sorted lastMessageAt index and on inbound mail move only that id to the front of the index. The cost is two views of the same data, but no full sort of thousands of rows per message.',
+            'Dialogi trzymam w Map po id plus osobny posortowany indeks lastMessageAt i przy przychodzącej wiadomości przesuwam tylko to id na początek indeksu. Koszt to dwa widoki tych samych danych, ale nie ma pełnego sortu tysięcy wierszy na każdą wiadomość.',
+          ),
         ),
         node(
           'messageList',
@@ -282,6 +342,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Обратная виртуализация; догрузка истории вверх.', 'Reverse virtualisation; load history upwards.'),
           t('Окно из последних N без виртуализации на коротких тредах.', 'A last-N window without virtualisation on short threads.'),
           t('Как не теряете якорь скролла, когда сверху приезжает страница истории?', 'How do you keep the scroll anchor when a history page prepends?'),
+          t(
+            'Перед prepend запоминаю scrollHeight и первый видимый messageId, после вставки компенсирую дельту высоты, а виртуализатор якорит по id, не по индексу. Цена — лишний layout read и нельзя слепо делать concat в начало массива.',
+            'Before prepend I snapshot scrollHeight and the first visible messageId, then compensate the height delta; the virtualiser anchors by id, not index. The cost is an extra layout read and you cannot blindly concat onto the array head.',
+            'Przed prepend zapisuję scrollHeight i id pierwszej widocznej wiadomości, po wstawce kompensuję deltę wysokości, a wirtualizator kotwiczy po id, nie po indeksie. Koszt — dodatkowy layout read i nie można ślepo robić concat na początek tablicy.',
+          ),
         ),
         node(
           'normStore',
@@ -290,6 +355,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('conversations, messagesByConversation, статусы и clientId.', 'conversations, messagesByConversation, statuses and clientId.'),
           t('TanStack Query плюс узкий стор только для realtime-буфера.', 'TanStack Query plus a thin store just for the realtime buffer.'),
           t('Где дедуплицируете одно сообщение из HTTP-истории и с сокета?', 'Where do you dedupe one message from HTTP history and from the socket?'),
+          t(
+            'Дедуп делаю в нормализованном сторе по serverId, а до ack — по clientId; HTTP-страница и событие сокета пишут в одну карту сущностей. Цена — строгий контракт id на обоих путях, иначе в треде появятся двойники.',
+            'Dedupe lives in the normalised store by serverId, and by clientId until ack; HTTP history and the socket write the same entity map. The cost is a strict id contract on both paths, or the thread shows twins.',
+            'Dedup robię w znormalizowanym store po serverId, a do ack — po clientId; strona HTTP i zdarzenie socketu piszą do tej samej mapy encji. Koszt — ścisły kontrakt id po obu stronach, inaczej w wątku pojawią się sobowtóry.',
+          ),
         ),
         node(
           'ws',
@@ -298,6 +368,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Двусторонняя доставка, ack, heartbeat, backoff-реконнект.', 'Two-way delivery, ack, heartbeat, backoff reconnect.'),
           t('SSE, если клиент только слушает, а отправка идёт HTTP.', 'SSE if the client only listens and send stays on HTTP.'),
           t('Как восстанавливаете пропуски после обрыва по messageId?', 'How do you recover gaps after a drop using messageId?'),
+          t(
+            'После reconnect отправляю lastSeenMessageId и прошу replay у сервера либо делаю HTTP catch-up до текущего края, затем снова слушаю сокет. Цена — короткий catch-up запрос и возможные дубли, которые стор уже дедуплицирует.',
+            'After reconnect I send lastSeenMessageId and ask the server to replay, or I HTTP catch-up to the tip, then listen again. The cost is a short catch-up request and possible duplicates the store already dedupes.',
+            'Po reconnect wysyłam lastSeenMessageId i proszę serwer o replay albo robię HTTP catch-up do bieżącej krawędzi, potem znów słucham socketu. Koszt to krótki request catch-up i możliwe duplikaty, które store i tak zdeduplikuje.',
+          ),
         ),
         node(
           'api',
@@ -306,6 +381,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Cursor-пагинация истории; идемпотентная отправка по clientId.', 'Cursor history; idempotent send by clientId.'),
           t('Полный dump переписки файлом — только для экспорта, не для UI.', 'A full transcript dump is for export, not for the UI.'),
           t('Какой TTL у курсора и что, если сообщение удалили в середине страницы?', 'What is the cursor TTL, and what if a message is deleted mid-page?'),
+          t(
+            'Курсор считаю непрозрачным и живучим часами, не минутами; дыру в середине страницы оставляю tombstone или пропуск по id, не перенумеровывая всю историю. Цена — UI должен уметь пустую дыру, зато курсоры соседей не ломаются.',
+            'I treat the cursor as opaque and hours-long, not minutes; a mid-page delete stays a tombstone or a hole by id, without reindexing history. The cost is UI that can render a gap, but neighbour cursors stay valid.',
+            'Kursor traktuję jako nieprzezroczysty i ważny godzinami, nie minutami; dziurę w środku strony zostawiam jako tombstone albo lukę po id, bez przerzucania całej historii. Koszt — UI musi umieć pustą lukę, za to kursory sąsiadów nie pękają.',
+          ),
         ),
         node(
           'idb',
@@ -314,6 +394,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Офлайн-очередь исходящих и кэш последних сообщений.', 'Offline outbox and a cache of recent messages.'),
           t('Только memory-очередь, если офлайн вне скоупа.', 'An in-memory queue only if offline is out of scope.'),
           t('Как чистите очередь после успешного ack и при конфликте clientId?', 'How do you drain the queue after ack and on a clientId conflict?'),
+          t(
+            'После ack удаляю запись outbox по clientId и подменяю временное сообщение серверным; при конфликте clientId помечаю локальную как failed и не реплею её вслепую. Цена — идемпотентность на сервере и явный UI «не доставлено».',
+            'After ack I delete the outbox row by clientId and replace the temp message with the server one; on clientId conflict I mark local as failed and do not blindly replay. The cost is server idempotency and an explicit “not delivered” UI.',
+            'Po ack usuwam rekord outbox po clientId i podmieniam tymczasową wiadomość na serwerową; przy konflikcie clientId oznaczam lokalną jako failed i nie replayuję jej na ślepo. Koszt — idempotencja na serwerze i jawny UI „nie dostarczono”.',
+          ),
         ),
       ],
       edges: [
@@ -370,6 +455,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Период и фильтры в search params — ссылкой можно поделиться, работает «назад».', 'Period and filters in search params — shareable links, Back works.'),
           t('Локальный стор фильтров, если шаринг вне скоупа.', 'A local filter store if sharing is out of scope.'),
           t('Как нормализуете пустые параметры, чтобы ключи Query не плодились?', 'How do you normalise empty params so Query keys do not explode?'),
+          t(
+            'Перед записью в URL и в query key сериализую фильтры канонически: пустые массивы и дефолтный период выкидываю, ключи сортирую. Цена — нужна одна функция normalizeFilters, иначе Back и расшаренные ссылки плодят кэш.',
+            'Before writing URL and query keys I serialise filters canonically: drop empty arrays and the default period, sort keys. The cost is one normalizeFilters helper, or Back and shared links explode the cache.',
+            'Zanim zapiszę URL i query key, serializuję filtry kanonicznie: puste tablice i domyślny okres wyrzucam, klucze sortuję. Koszt — jedna funkcja normalizeFilters, inaczej Back i współdzielone linki mnożą cache.',
+          ),
         ),
         node(
           'registry',
@@ -378,6 +468,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Конфиг → компонент; ядро дашборда не знает конкретные графики.', 'Config → component; the dashboard core does not know concrete charts.'),
           t('Жёстко прошитый набор виджетов на ранней стадии.', 'A hardcoded widget set early on.'),
           t('Кто владеет контрактом конфига и как добавляют виджет без релиза ядра?', 'Who owns the config contract, and how do you add a widget without a core release?'),
+          t(
+            'Контракт конфига держит платформа дашборда: id, query key, loader и слот; виджет подключаю регистрацией модуля, без правки ядра. Цена — жёсткий контракт и поле version, зато новый график едет отдельным бандлом.',
+            'The dashboard platform owns the config contract: id, query key, loader, slot; a widget is a module registration, not a core edit. The cost is a strict contract and a version field, but a new chart ships as its own bundle.',
+            'Kontrakt configu należy do platformy dashboardu: id, query key, loader i slot; widget podpinam rejestracją modułu, bez edycji jądra. Koszt to twardy kontrakt i pole version, za to nowy wykres jedzie osobnym bundlem.',
+          ),
         ),
         node(
           'query',
@@ -386,6 +481,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Независимые запросы: свой loading/error, общий кэш по ключу фильтров.', 'Independent requests: own loading/error, shared cache by filter key.'),
           t('Один большой запрос на весь дашборд — дешевле, но падает всё сразу.', 'One big request for the whole dashboard is cheaper but fails all at once.'),
           t('Как отменяете запросы при смене периода, не мигая всеми виджетами?', 'How do you abort on period change without flashing every widget?'),
+          t(
+            'Ключ запроса меняю вместе с нормализованным периодом, keepPreviousData оставляю на виджет, abort идёт по ключу Query. Цена — виджеты показывают старые цифры с пометкой stale вместо спиннера на всю доску.',
+            'I change the query key with the normalised period, keepPreviousData per widget, and abort by Query key. The cost is widgets showing stale numbers with a stale mark instead of a board-wide spinner.',
+            'Zmieniam klucz zapytania razem z unormowanym okresem, keepPreviousData zostawiam na widgecie, abort idzie po kluczu Query. Koszt — widgety pokazują stare liczby ze znacznikiem stale zamiast spinnera na całą tablicę.',
+          ),
         ),
         node(
           'api',
@@ -394,6 +494,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Сервер считает ряды; клиент не складывает сырые события.', 'The server computes series; the client does not sum raw events.'),
           t('Предрасчитанный OLAP-куб / warehouse, если метрик много.', 'A precomputed OLAP cube / warehouse if there are many metrics.'),
           t('Какая гранулярность агрегации и что при слишком широком периоде?', 'What aggregation grain, and what happens on a too-wide period?'),
+          t(
+            'Зерно беру от длины периода: час для дня, день для месяца, иначе ряд слишком плотный. Слишком широкий период режу лимитом точек или downsampling на сервере и возвращаю предупреждение; цена — меньше детализации, зато клиент не рисует десятки тысяч точек.',
+            'Grain follows period length: hour for a day, day for a month, or the series is too dense. A too-wide period is capped by a point limit or server downsampling plus a warning; the cost is less detail, but the client does not paint tens of thousands of points.',
+            'Ziarnistość biorę od długości okresu: godzina dla dnia, dzień dla miesiąca, inaczej szereg jest za gęsty. Zbyt szeroki okres tnę limitem punktów albo downsamplingiem na serwerze i zwracam ostrzeżenie; koszt — mniej szczegółów, ale klient nie rysuje dziesiątek tysięcy punktów.',
+          ),
         ),
         node(
           'worker',
@@ -402,6 +507,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Тяжёлый пересчёт и подготовка точек вне main thread.', 'Heavy recalculation and point prep off the main thread.'),
           t('Готовые серии с API и сразу canvas, если считать нечего.', 'Ready series from the API straight to canvas if there is nothing to compute.'),
           t('Как сериализуете данные в Worker и не копируете гигантский массив дважды?', 'How do you serialise into the Worker without copying a huge array twice?'),
+          t(
+            'В Worker отдаю transferable ArrayBuffer или SharedArrayBuffer с точками, а не structured clone объекта рядов. Цена — после transfer основной поток теряет буфер, пока Worker не вернёт готовые точки, и контракт становится бинарным.',
+            'I post a transferable ArrayBuffer or SharedArrayBuffer of points, not a structured clone of the series object. The cost is the main thread losing the buffer until the Worker returns prepared points, and the contract is binary.',
+            'Do Workera oddaję transferable ArrayBuffer albo SharedArrayBuffer z punktami, nie structured clone obiektu szeregów. Koszt — po transferze wątek główny traci bufor, aż Worker zwróci gotowe punkty, i kontrakt jest binarny.',
+          ),
         ),
       ],
       edges: [
@@ -459,6 +569,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Каталог и карточка как кэшируемый HTML.', 'Catalogue and product as cacheable HTML.'),
           t('CSR, если SEO не нужен.', 'CSR if SEO is not needed.'),
           t('Какой TTL и какой тег инвалидации у карточки?', 'What TTL and invalidation tag does the product page use?'),
+          t(
+            'Карточку кладу на ISR с тегом product:{id} и TTL от минут до часа: HTML может быть чуть старше, inStock добиваю клиентским Query. Цена — после смены цены короткая stale-страница, зато CDN держит низкий TTFB.',
+            'The product page is ISR tagged product:{id} with a minutes-to-hour TTL: HTML may be slightly stale, inStock is filled by client Query. The cost is a short stale page after a price change, but the CDN keeps TTFB low.',
+            'Kartę produktu kładę na ISR z tagiem product:{id} i TTL od minut do godziny: HTML może być trochę starszy, inStock dociągam client Query. Koszt — po zmianie ceny krótka stale-strona, ale CDN trzyma TTFB.',
+          ),
         ),
         node(
           'app',
@@ -467,6 +582,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Фильтры из URL, страница не держит второй стор выдачи.', 'Filters from the URL; the page does not keep a second listing store.'),
           t('Локальный useState фильтров, если шарить ссылку не нужно.', 'Local useState for filters if shareable links are not needed.'),
           t('Как не устроить водопад запросов фасетов?', 'How do you avoid a facet request waterfall?'),
+          t(
+            'Фасеты отдаю тем же ответом, что и items с cursor, одним ключом Query от нормализованных фильтров. Отдельный /facets после листинга — это водопад; цена — чуть более тяжёлый первый payload, зато один round-trip.',
+            'Facets come in the same response as items and cursor, one Query key from normalised filters. A separate /facets after the listing is the waterfall; the cost is a slightly heavier first payload, but one round-trip.',
+            'Facety oddaję w tej samej odpowiedzi co items i cursor, jednym kluczem Query od unormowanych filtrów. Osobny /facets po listingu to kaskada; koszt — trochę cięższy pierwszy payload, za to jeden round-trip.',
+          ),
         ),
         node(
           'query',
@@ -475,6 +595,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Листинг и остаток на складе — кэш Query.', 'Listing and stock live in the Query cache.'),
           t('Сырой fetch в компоненте карточки.', 'Raw fetch inside the product card.'),
           t('Какой ключ у листинга, когда меняется только сортировка?', 'What is the listing key when only sort changes?'),
+          t(
+            'В ключ листинга входят нормализованные фильтры и sort, курсор живёт только внутри страниц infinite query. Смена сортировки даёт новый ключ и не смешивает страницы; цена — холодный кэш на каждую сортировку.',
+            'The listing key includes normalised filters and sort; the cursor stays inside infinite-query pages. A sort change is a new key and does not mix pages; the cost is a cold cache per sort.',
+            'W klucz listingu wchodzą unormowane filtry i sort, kursor zostaje wewnątrz stron infinite query. Zmiana sortowania daje nowy klucz i nie miesza stron; koszt — zimny cache na każde sortowanie.',
+          ),
         ),
         node(
           'cart',
@@ -483,6 +608,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Гость локально, после логина merge на сервер.', 'Guest locally, merge to the server after login.'),
           t('Только серверная корзина и логаут-стенка.', 'Server-only cart and a login wall.'),
           t('Что если merge конфликтует по qty?', 'What if merge conflicts on qty?'),
+          t(
+            'При merge беру max гостевого и серверного qty или сумму, если намерение явно «добавить», и возвращаю конфликтные строки клиенту. Цена — нужно показать пользователю итог, иначе логин сюрпризом меняет корзину.',
+            'On merge I take the max of guest and server qty, or a sum if the intent is “add”, and return conflicted lines to the client. The cost is showing the user the result, or login surprises the cart.',
+            'Przy merge biorę max z guestQty i serverQty albo sumę, jeśli intencja to „dodaj”, i zwracam konfliktowe pozycje klientowi. Koszt — trzeba pokazać użytkownikowi wynik, inaczej login zaskoczy koszykiem.',
+          ),
         ),
       ],
       edges: [
@@ -541,6 +671,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Собирает колонки, не считает rank.', 'Composes columns, does not compute rank.'),
           t('Один гигантский список без колонок.', 'One giant list without columns.'),
           t('Где живёт WIP-лимит — UI или сервер?', 'Where does the WIP limit live — UI or server?'),
+          t(
+            'WIP-лимит проверяю на сервере в PATCH карточки, UI только предупреждает заранее, иначе другая вкладка обойдёт правило. Цена — лишний 409 и откат optimistic, зато одно правило для всех клиентов.',
+            'WIP is enforced on the server in the card PATCH; the UI only warns early, or another tab bypasses the limit. The cost is an extra 409 and optimistic rollback, but one rule for every client.',
+            'Limit WIP egzekwuję na serwerze w PATCH karty, UI tylko wcześniej ostrzega, bo inaczej inna karta obejdzie limit. Koszt — dodatkowy 409 i rollback optimistic, za to jedna reguła dla wszystkich klientów.',
+          ),
         ),
         node(
           'query',
@@ -549,6 +684,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Карточки и колонки в кэше; realtime делает setQueryData.', 'Cards and columns in cache; realtime uses setQueryData.'),
           t('Отдельный realtime-стор.', 'A separate realtime store.'),
           t('Как мержите чужой move с локальным optimistic?', 'How do you merge a remote move with local optimistic state?'),
+          t(
+            'Локальный optimistic держу по cardId и revision; чужой move применяю через setQueryData, если удалённая revision новее, иначе игнорирую и жду ack. Цена — карточка может коротко моргнуть, зато порядок не рвётся.',
+            'Local optimistic is keyed by cardId and revision; a remote move applies via setQueryData if remote revision is newer, else I ignore it and wait for ack. The cost is a brief flicker, but order does not tear.',
+            'Lokalny optimistic trzymam po cardId i revision; cudzy move wkładam przez setQueryData, jeśli remote revision jest nowszy, inaczej ignoruję i czekam na ack. Koszt — karta może krótko mignąć, ale kolejność się nie rwie.',
+          ),
         ),
         node(
           'live',
@@ -557,6 +697,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('События card.moved в кэш.', 'card.moved events into the cache.'),
           t('Polling раз в 10 секунд, если коллаборация редкая.', 'Poll every 10s if collaboration is rare.'),
           t('Что после реконнекта — snapshot или лог событий?', 'After reconnect — a snapshot or an event log?'),
+          t(
+            'После реконнекта беру snapshot доски, если пропуск мог быть большим, а короткий обрыв закрываю логом card.moved от lastRevision. Цена snapshot — тяжелее payload, цена лога — риск дыр после длинного офлайна.',
+            'After reconnect I take a board snapshot if the gap may be large, and a short drop is closed with a card.moved log from lastRevision. Snapshot costs a heavier payload; the log risks holes after a long offline.',
+            'Po reconnect biorę snapshot tablicy, jeśli luka mogła być duża, a krótki zanik zamykam logiem card.moved od lastRevision. Koszt snapshotu to cięższy payload, koszt logu — ryzyko dziur po długim offline.',
+          ),
         ),
         node(
           'api',
@@ -565,6 +710,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
           t('Сервер сериализует порядок, 409 при конфликте revision.', 'The server serialises order, 409 on revision conflict.'),
           t('Клиент сам перенумеровывает всех соседей целыми.', 'The client reindexes every neighbour with integers.'),
           t('Как не кончатся дробные rank?', 'How do you avoid running out of fractional ranks?'),
+          t(
+            'Rank — дробь между соседями; если мантисса кончается, сервер редко перенумеровывает колонку, клиент не трогает всех соседей на каждый drag. Цена — редкий тяжёлый PATCH колонки и короткий lock.',
+            'Rank is a fraction between neighbours; when mantissa runs out the server rarely rebalances the column, the client does not reindex everyone on each drag. The cost is a rare heavy column PATCH and a short lock.',
+            'Rank to ułamek między sąsiadami; gdy skończy się mantysa, serwer rzadko przerachowuje kolumnę, klient nie numeruje wszystkich sąsiadów przy każdym drag. Koszt — rzadki ciężki PATCH kolumny i krótki lock.',
+          ),
         ),
       ],
       edges: [

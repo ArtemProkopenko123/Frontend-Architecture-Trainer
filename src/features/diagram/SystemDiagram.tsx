@@ -10,6 +10,7 @@ import '@xyflow/react/dist/style.css'
 import type { DiagramSpec, Locale } from '../../content/types'
 import { t, ui } from '../../i18n/ui'
 import { ArchNode, type ArchFlowNode } from './ArchNode'
+import { FollowUpAnswer } from './FollowUpAnswer'
 import { toFlowEdges, toFlowNodes } from './layout'
 
 const nodeTypes = { arch: ArchNode } satisfies NodeTypes
@@ -28,9 +29,11 @@ export function SystemDiagram({
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [nodes, setNodes] = useState<ArchFlowNode[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
+  const [answerOpen, setAnswerOpen] = useState(false)
 
   useEffect(() => {
     setSelectedId(null)
+    setAnswerOpen(false)
     if (!diagram) {
       setNodes([])
       setEdges([])
@@ -52,13 +55,19 @@ export function SystemDiagram({
   const selected = diagram?.nodes.find((node) => node.id === selectedId)
 
   useEffect(() => {
+    setAnswerOpen(false)
+  }, [selectedId])
+
+  useEffect(() => {
     if (!selectedId) return
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSelectedId(null)
+      if (event.key !== 'Escape') return
+      if (answerOpen) return
+      setSelectedId(null)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selectedId])
+  }, [selectedId, answerOpen])
 
   return (
     <section>
@@ -104,6 +113,12 @@ export function SystemDiagram({
                 {': '}
                 {t(selected.followUp, locale)}
               </p>
+              <FollowUpAnswer
+                question={selected.followUp}
+                answer={selected.followUpAnswer}
+                locale={locale}
+                onOpenChange={setAnswerOpen}
+              />
               <button type="button" className="ghost" onClick={() => setSelectedId(null)}>
                 {t(ui.closeNode, locale)}
               </button>

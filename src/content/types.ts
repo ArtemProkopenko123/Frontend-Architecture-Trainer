@@ -98,6 +98,7 @@ export type DiagramNodeSpec = {
   why: Localized
   alternative: Localized
   followUp: Localized
+  followUpAnswer: Localized
 }
 
 export type DiagramEdgeSpec = {

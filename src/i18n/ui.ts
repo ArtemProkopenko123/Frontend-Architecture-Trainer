@@ -51,6 +51,7 @@ export const ui = {
   nodeWhy: { ru: 'Зачем', en: 'Why', pl: 'Po co' },
   nodeAlt: { ru: 'Чем заменить', en: 'What instead', pl: 'Czym zastąpić' },
   nodeFollowUp: { ru: 'Уточнение', en: 'Follow-up', pl: 'Doprecyzowanie' },
+  showFollowUpAnswer: { ru: 'Показать ответ', en: 'Show answer', pl: 'Pokaż odpowiedź' },
   closeNode: { ru: 'Закрыть', en: 'Close', pl: 'Zamknij' },
   constructorNotes: { ru: 'Как это меняет решение', en: 'How this changes the choice', pl: 'Jak to zmienia decyzję' },
   needContext: {
