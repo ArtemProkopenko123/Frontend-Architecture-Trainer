@@ -1,10 +1,11 @@
-import { GUIDE_DAYS } from '../content/guide'
+import { GUIDE_DAYS, hrefForGuideLink } from '../content/guide'
 import { TRICK_QUESTIONS } from '../content/prep'
+import { PROFILES } from '../content/profiles'
 import { RADIO_CASES } from '../content/radio'
 import { TOPIC_ORDER, TOPICS } from '../content/topics'
 import type { Locale, Localized } from '../content/types'
 
-export type SearchHitKind = 'topic' | 'card' | 'radio' | 'trick' | 'guide'
+export type SearchHitKind = 'topic' | 'card' | 'radio' | 'trick' | 'guide' | 'profile'
 
 export type SearchHit = {
   id: string
@@ -30,7 +31,25 @@ export function buildSearchIndex(): SearchHit[] {
       kind: 'guide',
       title: day.title,
       haystack: join([day.title, day.doneWhen]),
-      href: '?mode=guide',
+      href: hrefForGuideLink(day.link),
+    })
+  }
+  for (const profile of Object.values(PROFILES)) {
+    hits.push({
+      id: `profile-${profile.id}`,
+      kind: 'profile',
+      title: profile.title,
+      haystack: join([
+        profile.title,
+        profile.summary,
+        profile.rendering,
+        profile.structure,
+        profile.repo,
+        profile.state,
+        profile.why,
+        ...profile.tradeoffs,
+      ]),
+      href: `?mode=pipeline&step=choice&c.profile=${profile.id}`,
     })
   }
   for (const id of TOPIC_ORDER) {

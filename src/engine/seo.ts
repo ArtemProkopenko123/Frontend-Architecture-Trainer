@@ -37,9 +37,9 @@ const OG_LOCALE: Record<Locale, string> = {
 }
 
 const DESCRIPTION: Record<Locale, string> = {
-  ru: 'Тренажёр архитектуры фронтенда: контекст → варианты → выбор → цена → эволюция, RADIO, комнаты и курс. RU/EN; польский — бета с fallback на английский.',
-  en: 'Senior frontend architecture trainer: context → options → choice → cost → evolution, RADIO, rooms, and guide. RU/EN; Polish beta with English fallback.',
-  pl: 'Trener architektury frontendu: kontekst → warianty → wybór → koszt → ewolucja, RADIO, pokoje i kurs. RU/EN; polski beta z fallbackiem na angielski.',
+  ru: 'Тренажёр архитектуры фронтенда: контекст → варианты → выбор → цена → эволюция, RADIO, комнаты и 7-дневный курс. RU/EN; польский — бета с fallback на английский.',
+  en: 'Senior frontend architecture trainer: context → options → choice → cost → evolution, RADIO, rooms, and 7-day guide. RU/EN; Polish beta with English fallback.',
+  pl: 'Trener architektury frontendu: kontekst → warianty → wybór → koszt → ewolucja, RADIO, pokoje i 7-dniowy kurs. RU/EN; polski beta z fallbackiem na angielski.',
 }
 
 export function canonicalUrl(origin: string, path: string, search: string): string {

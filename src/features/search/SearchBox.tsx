@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import type { AppMode, PrepSection, RadioCaseId, TopicId } from '../../content/types'
+import { PROFILES } from '../../content/profiles'
+import type { AppMode, PrepSection, ProfileId, RadioCaseId, SessionStep, TopicId } from '../../content/types'
 import { buildSearchIndex, filterSearchHits, type SearchHit } from '../../engine/search'
 import { t, ui } from '../../i18n/ui'
 import { useSessionStore } from '../../store/sessionStore'
@@ -12,6 +13,14 @@ function applyHit(hit: SearchHit) {
   const store = useSessionStore.getState()
   if (!mode) return
   store.setMode(mode)
+  const step = url.searchParams.get('step') as SessionStep | null
+  if (step) store.setStep(step)
+  const profile = url.searchParams.get('c.profile') as ProfileId | null
+  if (profile && profile in PROFILES) {
+    // The store only keeps a profile alongside a complete context; otherwise ask for context first.
+    if (store.isContextComplete()) store.setSelectedProfileId(profile)
+    else store.setStep('context')
+  }
   const topic = url.searchParams.get('topic') as TopicId | null
   if (topic) store.setTopicId(topic)
   const radioCase = url.searchParams.get('case') as RadioCaseId | null

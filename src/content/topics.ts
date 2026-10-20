@@ -197,8 +197,8 @@ export const TOPICS: Record<TopicId, Topic> = {
         ),
       ],
       edges: [
-        edge('goal', 'boundaries', t('задаёт границы', 'shapes boundaries', 'wyznacza granice')),
-        edge('boundaries', 'automation', t('закрепляем правилом', 'enforced by rules', 'utrwalamy regułą')),
+        edge('goal', 'boundaries', t('задаём границы', 'set boundaries', 'wyznaczamy granice')),
+        edge('boundaries', 'automation', t('закрепляем правилом', 'enforce by rules', 'utrwalamy regułą')),
         edge('automation', 'signals', t('измеряем эффект', 'measure the effect', 'mierzymy efekt')),
         edge('signals', 'goal', t('пересмотр цели', 'revisit the goal', 'rewizja celu')),
       ],

@@ -10,13 +10,15 @@ Canon wording lives in [`Архитектура фронтенда подгот�
 
 | Day | What |
 | --- | --- |
-| 1 | Answer frame (pipeline start) |
-| 2 | Constructor: two different contexts |
-| 3 | Rooms: structure + state |
-| 4 | Rooms: rendering + API + performance |
+| 1 | Room: what architecture is |
+| 2 | Constructor: set the context (two runs) |
+| 3 | Room: rendering |
+| 4 | Room: accessibility |
 | 5 | RADIO: news feed with the 45-minute timer |
 | 6 | Your project story (prep) |
-| 7 | Full run: pipeline script + one RADIO case |
+| 7 | Full run: constructor from start to the script |
+
+Other rooms (structure, state, API, scale, performance, reliability, security, offline, i18n, leadership) are available under Topics and search.
 
 Open the **Guide** tab in the app, or `?mode=guide`.
 
