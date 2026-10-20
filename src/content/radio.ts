@@ -526,7 +526,11 @@ export const RADIO_CASES: Record<RadioCaseId, RadioCase> = {
       t('Оптимистичный rank, откат при 409.', 'Optimistic rank, rollback on 409.'),
       t('Виртуализация длинной колонки.', 'Virtualise a long column.'),
       t('Один сокет на вкладки через BroadcastChannel/SharedWorker.', 'One socket across tabs via BroadcastChannel/SharedWorker.'),
-      t('a11y: aria-grabbed, live region «карточка в колонке Review».', 'a11y: aria-grabbed, live region “card moved to Review”.'),
+      t(
+        'a11y: управление с клавиатуры и альтернативные действия «Переместить», понятные инструкции; live region сообщает «карточка перемещена в колонку Review».',
+        'a11y: keyboard controls and alternative “Move” actions, clear instructions; a live region announces “card moved to Review”.',
+        'a11y: sterowanie klawiaturą i alternatywne akcje „Przenieś”, jasne instrukcje; live region ogłasza „kartę przeniesiono do kolumny Review”.',
+      ),
     ],
     diagram: {
       nodes: [

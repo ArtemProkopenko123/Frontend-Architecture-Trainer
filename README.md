@@ -1,6 +1,6 @@
 # Frontend architecture trainer
 
-Interactive trilingual (RU/EN/PL) trainer for senior frontend architecture interviews. It is a **reasoning drill**, not a React encyclopedia: you rehearse context → options → choice → cost → evolution, timed RADIO rounds, topic rooms, and your project story.
+Interactive RU/EN trainer for senior frontend architecture interviews, with Polish available as a beta that falls back to English where translation is incomplete. It is a **reasoning drill**, not a React encyclopedia: you rehearse context → options → choice → cost → evolution, timed RADIO rounds, topic rooms, and your project story.
 
 Opinionated stack in the samples: React, TypeScript, TanStack Query, Zustand, Vite / Next. That is a sample of thought, not the only correct architecture. Personal drafts stay in this browser (`localStorage`). There is no account and no LLM.
 

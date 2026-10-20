@@ -362,8 +362,9 @@ export const TOPICS: Record<TopicId, Topic> = {
     ],
     followUps: [
       t(
-        'Context — доставка значения, не стор: любое изменение перерендеривает потребителей, поэтому он для темы, локали, DI. Zustand — мало boilerplate. Redux Toolkit — строгий поток и DevTools для большой команды. Jotai/Recoil — атомы для редакторов и канвасов.',
-        'Context delivers a value, it is not a store: any change re-renders consumers, so it is for theme, locale, DI. Zustand is low boilerplate. Redux Toolkit is a strict flow and DevTools for a large team. Jotai/Recoil are atoms for editors and canvases.',
+        'Context — доставка значения, не стор: любое изменение перерендеривает потребителей, поэтому он для темы, локали, DI. Zustand — мало boilerplate. Redux Toolkit — строгий поток и DevTools для большой команды. Jotai — атомы для редакторов и канвасов.',
+        'Context delivers a value, it is not a store: any change re-renders consumers, so it is for theme, locale, DI. Zustand is low boilerplate. Redux Toolkit is a strict flow and DevTools for a large team. Jotai provides atoms for editors and canvases.',
+        'Context dostarcza wartość, ale nie jest storem: każda zmiana renderuje konsumentów ponownie, więc pasuje do motywu, języka i DI. Zustand ma mało boilerplate. Redux Toolkit daje ścisły przepływ i DevTools dla dużego zespołu. Jotai zapewnia atomy dla edytorów i obszarów roboczych.',
       ),
       t(
         'Лишние ререндеры: селекторы на минимальный срез, раздельные контексты, не класть производные в стор, мемоизация строк и виртуализация.',

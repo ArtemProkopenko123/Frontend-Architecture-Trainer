@@ -105,9 +105,10 @@ export function AppShell() {
           <button
             type="button"
             className={locale === 'pl' ? 'active' : ''}
+            aria-label={t(ui.langPlBeta, locale)}
             onClick={() => setLocale('pl')}
           >
-            {ui.langPl.pl}
+            {ui.langPl.pl} <small aria-hidden="true">beta</small>
           </button>
         </div>
       </header>

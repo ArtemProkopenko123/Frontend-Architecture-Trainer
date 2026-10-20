@@ -52,6 +52,14 @@ function collectLocalized(value: unknown, path: string, out: LocalizedLeaf[] = [
 const MAY_MATCH_EN = /\.diagram\.nodes\[\d+\]\.label$/
 
 describe('TOPICS', () => {
+  it('does not recommend Recoil in the state guidance', () => {
+    const guidance = collectLocalized(TOPICS.state, 'state')
+      .flatMap(({ value }) => Object.values(value))
+      .join(' ')
+
+    expect(guidance).not.toContain('Recoil')
+  })
+
   it('every topic has checks, structure, sample and at least one related card', () => {
     for (const id of TOPIC_IDS) {
       const topic = TOPICS[id]

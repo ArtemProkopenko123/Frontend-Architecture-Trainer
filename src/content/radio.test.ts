@@ -5,6 +5,14 @@ import type { RadioCaseId } from './types'
 const CASE_IDS: RadioCaseId[] = ['feed', 'autocomplete', 'chat', 'dashboard', 'shop', 'kanban']
 
 describe('RADIO_CASES', () => {
+  it('does not recommend aria-grabbed for kanban moves', () => {
+    const guidance = RADIO_CASES.kanban.optimizations
+      .flatMap((text) => Object.values(text))
+      .join(' ')
+
+    expect(guidance).not.toContain('aria-grabbed')
+  })
+
   it('defines the radio cases including shop and kanban', () => {
     expect(Object.keys(RADIO_CASES).sort()).toEqual([...CASE_IDS].sort())
     expect(getRadioCase('shop').diagram.nodes.some((node) => node.kind === 'query')).toBe(true)
