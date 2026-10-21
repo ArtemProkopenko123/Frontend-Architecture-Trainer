@@ -11,9 +11,17 @@ import type { DiagramSpec, Locale } from '../../content/types'
 import { t, ui } from '../../i18n/ui'
 import { ArchNode, type ArchFlowNode } from './ArchNode'
 import { FollowUpAnswer } from './FollowUpAnswer'
-import { toFlowEdges, toFlowNodes } from './layout'
+import { positionsFromNodes, toFlowEdges, toFlowNodes } from './layout'
 
 const nodeTypes = { arch: ArchNode } satisfies NodeTypes
+
+function edgesFor(
+  diagram: DiagramSpec,
+  locale: Locale,
+  nodes: { id: string; position: { x: number; y: number } }[],
+): Edge[] {
+  return toFlowEdges(diagram.edges, locale, positionsFromNodes(nodes))
+}
 
 export function SystemDiagram({
   locale,
@@ -36,12 +44,18 @@ export function SystemDiagram({
     setAnswerOpen(false)
     if (!diagram) {
       setNodes([])
-      setEdges([])
       return
     }
     setNodes(toFlowNodes(diagram.nodes, locale))
-    setEdges(toFlowEdges(diagram.edges, locale))
   }, [diagram, locale, canvasKey])
+
+  useEffect(() => {
+    if (!diagram) {
+      setEdges([])
+      return
+    }
+    setEdges(edgesFor(diagram, locale, nodes))
+  }, [diagram, locale, nodes])
 
   const onNodesChange = useCallback((changes: NodeChange<ArchFlowNode>[]) => {
     setNodes((current) => applyNodeChanges(changes, current))
